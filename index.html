@@ -162,8 +162,20 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 .feature-panel .panel-title{font-size:14px;line-height:1.3}
 .feature-panel .panel-body{padding:3px 12px 11px}
 .feature-tags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.feature-hint{font-size:10.5px;color:#8492A0;margin-top:9px}
-.feature-actions{display:none;gap:4px;white-space:nowrap}.edit-mode .feature-actions{display:flex}
+.feature-actions{display:none;gap:4px;white-space:nowrap;align-items:center}.edit-mode .feature-actions{display:flex}
+.drag-grip{display:none;color:#8393A1;font-size:16px;line-height:1;cursor:grab;user-select:none;padding:0 3px}
+.edit-mode .drag-grip{display:inline-block}
+.edit-mode .feature-panel[draggable="true"]{cursor:grab}
+.edit-mode .feature-panel[draggable="true"]:active,.edit-mode .drag-grip:active{cursor:grabbing}
+.feature-row.dragging{opacity:.38}
+.feature-row.drag-over .feature-panel{outline:2px solid #139FEA;outline-offset:4px}
+.feature-row.drag-before .feature-panel:after,
+.feature-row.drag-after .task-column:after{
+  content:"";position:absolute;left:0;right:0;height:3px;background:#139FEA;z-index:5
+}
+.feature-row.drag-before .feature-panel:after{top:-15px}
+.feature-row.drag-after .task-column{position:relative}
+.feature-row.drag-after .task-column:after{bottom:-14px}
 .task-column{min-width:0}
 .task-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;min-height:24px}
 .task-toolbar .count{font-size:11px;color:#7A8997}
@@ -399,6 +411,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
           <div class="panel-heading">
             <h3 class="panel-title">${esc(f.name)}</h3>
             <span class="feature-actions">
+              <span class="drag-grip" title="Перетащить Ф-л" aria-hidden="true">⠿</span>
               <button class="btn btn-default btn-xs" data-action="edit-feature" data-fi="${fi}">Изм.</button>
               <button class="btn btn-danger btn-xs" data-action="delete-feature" data-fi="${fi}">×</button>
             </span>
@@ -408,7 +421,6 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
               <span class="label ${moneyLabel(mp.level)}">${esc(mp.level)}</span>
               <span class="label label-info">${f.tasks.length} задач</span>
             </div>
-            <div class="feature-hint">Навести: зачем и монетизация</div>
           </div>
         </div>
         <div class="task-column">
@@ -438,7 +450,81 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     })
     if(!shown)host.innerHTML=`<div class="no-results">По запросу ничего не найдено в этом модуле.</div>`;
     bindPopover();
+    bindFeatureDragAndDrop();
     requestAnimationFrame(()=>requestAnimationFrame(drawNetworkArrows));
+  }
+
+  function clearDragMarks(){
+    document.querySelectorAll(".feature-row").forEach(row=>{
+      row.classList.remove("dragging","drag-over","drag-before","drag-after");
+    });
+  }
+
+  function bindFeatureDragAndDrop(){
+    const canDrag=editMode && !q();
+    document.querySelectorAll(".feature-row").forEach(row=>{
+      const panel=row.querySelector(".feature-panel");
+      if(!panel)return;
+      panel.setAttribute("draggable",canDrag?"true":"false");
+      if(!canDrag)return;
+
+      panel.addEventListener("dragstart",e=>{
+        if(e.target.closest("button")){e.preventDefault();return}
+        const fi=Number(row.dataset.fi);
+        row.classList.add("dragging");
+        e.dataTransfer.effectAllowed="move";
+        e.dataTransfer.setData("text/plain",String(fi));
+        hidePopover();
+      });
+
+      panel.addEventListener("dragend",()=>{
+        clearDragMarks();
+        requestAnimationFrame(drawNetworkArrows);
+      });
+
+      row.addEventListener("dragover",e=>{
+        e.preventDefault();
+        const from=Number(e.dataTransfer.getData("text/plain"));
+        const to=Number(row.dataset.fi);
+        if(Number.isNaN(from)||from===to)return;
+        document.querySelectorAll(".feature-row").forEach(x=>{
+          if(x!==row)x.classList.remove("drag-over","drag-before","drag-after");
+        });
+        row.classList.add("drag-over");
+        const r=row.getBoundingClientRect();
+        const after=e.clientY > r.top + r.height/2;
+        row.classList.toggle("drag-before",!after);
+        row.classList.toggle("drag-after",after);
+        e.dataTransfer.dropEffect="move";
+      });
+
+      row.addEventListener("dragleave",e=>{
+        if(!row.contains(e.relatedTarget)){
+          row.classList.remove("drag-over","drag-before","drag-after");
+        }
+      });
+
+      row.addEventListener("drop",e=>{
+        e.preventDefault();
+        const from=Number(e.dataTransfer.getData("text/plain"));
+        const to=Number(row.dataset.fi);
+        if(Number.isNaN(from)||Number.isNaN(to)||from===to){clearDragMarks();return}
+
+        const r=row.getBoundingClientRect();
+        const after=e.clientY > r.top + r.height/2;
+        const features=state[active].features;
+        const [moved]=features.splice(from,1);
+
+        let insertAt=to + (after?1:0);
+        if(from < insertAt) insertAt--;
+        insertAt=Math.max(0,Math.min(insertAt,features.length));
+        features.splice(insertAt,0,moved);
+
+        save();
+        clearDragMarks();
+        render();
+      });
+    });
   }
 
   function drawNetworkArrows(){
@@ -579,7 +665,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
   $("searchInput").oninput=render;$("showClosed").onchange=render;
   window.addEventListener("resize",()=>requestAnimationFrame(drawNetworkArrows));
   $("editModuleBtn").onclick=moduleModal;$("addFeatureBtn").onclick=()=>featureModal(null);
-  $("editToggle").onclick=()=>{editMode=!editMode;document.body.classList.toggle("edit-mode",editMode);$("editToggle").textContent=editMode?"Завершить":"Редактировать";$("editToggle").className="btn "+(editMode?"btn-default":"btn-primary")};
+  $("editToggle").onclick=()=>{editMode=!editMode;document.body.classList.toggle("edit-mode",editMode);$("editToggle").textContent=editMode?"Завершить":"Редактировать";$("editToggle").className="btn "+(editMode?"btn-default":"btn-primary");render()};
 
   function download(name,content,type){const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),700)}
   $("exportJson").onclick=()=>download("DNM_карта_развития.json",JSON.stringify(state,null,2),"application/json;charset=utf-8");
