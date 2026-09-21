@@ -191,6 +191,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 .add-feature-wrap{position:relative;z-index:3;text-align:center;margin-top:24px}
 .add-feature{display:none}.edit-mode .add-feature{display:inline-block}.edit-mode .add-feature{display:inline-block}
 .edit-module{display:none}.edit-mode .edit-module{display:inline-block}
+.drag-help{display:none;margin:0 auto 14px;max-width:620px;text-align:center;color:#536273;background:#fff;border:1px solid #DCE4EA;padding:8px 12px;border-radius:3px}.edit-mode .drag-help{display:block}
 .no-results{padding:38px 15px;color:#6F7E8E;text-align:center;border:1px dashed #C9D5DE;background:#fff}
 
 .popover .money-block{padding:8px 9px;background:#F4F7FC;border-left:3px solid #139FEA;margin-top:9px}
@@ -216,6 +217,582 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
   .feature-grid{grid-template-columns:1fr;gap:24px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+.nav-tabs{border-bottom:1px solid var(--line);display:flex;gap:0;margin:0 0 18px}
+.nav-tabs>li{margin-bottom:-1px}
+.nav-tabs>li>a{padding:9px 14px;color:#5B6977;border:1px solid transparent;border-bottom-color:var(--line);background:transparent;font-size:12.5px}
+.nav-tabs>li>a:hover{background:#F5F8FA;color:var(--ink)}
+.nav-tabs>li.active>a{color:#0E79B2;background:#fff;border-color:var(--line);border-bottom-color:#fff;font-weight:700}
+.view-hidden{display:none!important}
+.product-description{background:#fff;border:1px solid var(--line);padding:18px;margin-bottom:30px}
+.product-description-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.product-description-head h3{margin:0 0 4px;font-size:18px}
+.product-description-head p{margin:0;color:var(--muted);font-size:11px}
+.description-edit{display:none}.edit-mode .description-edit{display:inline-block}
+.description-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.desc-section{border:1px solid var(--line);background:#FAFCFD;padding:13px 14px;min-width:0}
+.desc-section.functional{grid-column:1/-1}
+.desc-section h4{margin:0 0 8px;font-size:12px;color:#0E79B2}
+.desc-section .desc-text{white-space:pre-line;color:#3F4C59;line-height:1.55;font-size:12.5px}
+.description-source{margin-top:12px;color:#8A97A4;font-size:10.5px}
+@media(max-width:760px){.description-grid{grid-template-columns:1fr}.desc-section.functional{grid-column:auto}}
+
+
+/* v8 overrides */
+.save-state{display:none}
+.module-tabs-heading{display:none}
+.modules-horizontal{gap:8px;padding:2px 0}
+.modules-horizontal>li>a,.nav-tabs>li>a{
+  border:1px solid #7E8FCF!important;background:#fff!important;color:#5F70B4!important;
+  border-radius:0!important;padding:10px 16px!important;font-weight:400!important
+}
+.modules-horizontal>li>a:hover,.nav-tabs>li>a:hover{background:#F6F8FF!important;color:#5062AD!important}
+.modules-horizontal>li.active>a,.nav-tabs>li.active>a{
+  background:#EDF1FF!important;color:#5062AD!important;border-color:#7E8FCF!important;font-weight:700!important
+}
+.modules-horizontal .badge{display:none}
+.nav-tabs{border-bottom:0;display:flex;gap:0;margin:0 0 18px}
+.btn-primary{background:#6D78B8;border-color:#5F6AAD}
+.btn-primary:hover{background:#5F6AAD;border-color:#5560A5}
+.actions-dropdown{position:relative}
+.actions-menu{
+  position:absolute;right:0;top:calc(100% + 8px);display:none;min-width:240px;background:#fff;border:1px solid var(--line);
+  box-shadow:0 12px 28px rgba(32,41,54,.12);z-index:70;padding:6px 0
+}
+.actions-dropdown.open .actions-menu{display:block}
+.actions-item{display:block;width:100%;text-align:left;background:transparent;border:0;padding:10px 14px;color:#41515F;font-size:13px}
+.actions-item:hover{background:#F5F8FA}
+.actions-item.danger{color:#B34B57}
+.actions-divider{height:1px;background:var(--line);margin:5px 0}
+.module-header{margin-bottom:10px}
+.header-actions{gap:8px}
+.summary-strip{display:block;padding:8px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.summary-progress-wrap{max-width:1180px}
+.summary-progress-labels{position:relative;height:24px;margin-bottom:8px;font-size:13px;color:#4F5E6D}
+.summary-progress-label{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;font-weight:700}
+.summary-progress-label.planned{color:#6E717A}
+.summary-progress-label.inwork{color:#5A67AE}
+.summary-progress-label.closed{color:#5E9F44}
+.summary-progress{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#D8D8D8}
+.summary-progress-segment{height:100%}
+.summary-progress-segment.planned{background:#CFCFCF}
+.summary-progress-segment.inwork{background:#6D78B8}
+.summary-progress-segment.closed{background:#97BF6D}
+.legend{display:none!important}
+.root-kicker{display:none}
+.network-root-wrap{margin-top:2px}
+.feature-panel .panel-body{padding:5px 12px 12px}
+.desc-section.users,.desc-section.beneficiaries{grid-column:span 1}
+.description-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.description-grid .desc-section.functional{grid-column:1 / -1}
+@media(max-width:760px){
+  .summary-progress-labels{font-size:11px}
+  .actions-menu{left:0;right:auto}
+  .description-grid{grid-template-columns:1fr}
+}
+
+
+/* v9: dsf-common-ui chips / counters / alert-info */
+
+/* CHIP */
+.label{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:4px 10px;
+  min-height:25px;
+  border-radius:14px;
+  border:1px solid transparent;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+/* label-default: светлый нейтральный чип из базовой группы */
+.label-default{
+  color:#30343A;
+  background:#FFFFFF;
+  border-color:#D8DDE2;
+}
+
+/* label-primary: основной сине-фиолетовый чип */
+.label-primary{
+  color:#FFFFFF;
+  background:#7886C4;
+  border-color:#6F7DBC;
+}
+
+/* label-success */
+.label-success{
+  color:#FFFFFF;
+  background:#93C465;
+  border-color:#82B455;
+}
+
+/* label-yellow */
+.label-yellow{
+  color:#343434;
+  background:#F0D55C;
+  border-color:#D8BC46;
+}
+
+/* label-grey2 */
+.label-grey2{
+  color:#404348;
+  background:#DEDEDE;
+  border-color:#CDCDCD;
+}
+
+.label-info{
+  color:#6978B8;
+  background:#EEF1FC;
+  border-color:#D7DDF3;
+}
+
+.label-warning{
+  color:#4D4424;
+  background:#E2C454;
+  border-color:#CFB140;
+}
+
+.label-danger{
+  color:#FFFFFF;
+  background:#B95B56;
+  border-color:#A64D49;
+}
+
+/* Число в круге: референс LABEL_CIRCLE */
+.label-circle{
+  display:inline-flex;
+  width:34px;height:34px;
+  align-items:center;justify-content:center;
+  flex:0 0 34px;
+  border-radius:50%;
+  background:#EEF1FC;
+  color:#7180C1;
+  font-size:14px;
+  font-weight:500;
+  line-height:1;
+}
+.feature-tags{min-height:34px}
+
+/* Описание продукта: notification alert-info */
+.product-description{
+  background:transparent;
+  border:0;
+  padding:0;
+}
+.product-description-head{
+  background:#fff;
+  border:1px solid var(--line);
+  padding:14px 16px;
+  margin-bottom:12px;
+}
+.description-grid{
+  display:block;
+}
+.desc-section.alert.alert-info{
+  display:block;
+  padding:16px 18px;
+  margin:0 0 8px;
+  border:0;
+  border-radius:12px;
+  background:#E8EDF9;
+  color:#6F7FC1;
+  box-shadow:none;
+}
+.desc-section.alert.alert-info .desc-alert-title{
+  margin:0 0 14px;
+  font-size:14px;
+  line-height:1.25;
+  font-weight:700;
+  color:#6F7FC1;
+}
+.desc-section.alert.alert-info .desc-alert-text{
+  white-space:pre-line;
+  color:#6F7FC1;
+  font-size:13px;
+  line-height:1.55;
+}
+.description-source{
+  padding:6px 2px 0;
+}
+
+
+/* v10: hierarchy/navigation adjustments */
+.module-subtabs-inner{
+  padding:0 18px 9px;
+  background:#fff;
+  border-top:1px solid #EEF1F4;
+}
+.module-subtabs-inner .nav-tabs{
+  margin:0;
+  display:flex;
+  gap:0;
+}
+.module-subtabs-inner .nav-tabs>li>a{
+  padding:8px 14px!important;
+}
+.network-root-wrap{
+  margin:0 0 40px!important;
+  min-height:12px;
+}
+.network-root{display:none!important}
+.network-root-anchor{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#139FEA;
+  box-shadow:0 0 0 3px #EAF7FD;
+}
+@media(max-width:760px){
+  .module-subtabs-inner{padding:0 10px 8px}
+  .module-subtabs-inner .nav-tabs{overflow-x:auto}
+}
+
+
+/* v11: один горизонтальный уровень функционалов */
+#roadmapView{overflow-x:auto;overflow-y:visible;padding-bottom:12px}
+.network-board{
+  width:max-content!important;
+  min-width:100%!important;
+  overflow:visible!important;
+}
+.feature-grid{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-items:flex-start!important;
+  gap:24px!important;
+  width:max-content!important;
+  min-width:100%!important;
+  overflow:visible!important;
+  padding:0 4px 12px!important;
+}
+.feature-row{
+  flex:0 0 330px!important;
+  width:330px!important;
+  min-width:330px!important;
+}
+.network-root-wrap{
+  width:100%;
+  justify-content:center;
+}
+
+/* Приоритет монетизации */
+.label-dark-green{
+  color:#FFFFFF;
+  background:#5E7549;
+  border-color:#4E643D;
+}
+
+/* Кнопка видимости задач по референсу с глазом */
+.task-toolbar{
+  justify-content:flex-end!important;
+  min-height:28px!important;
+}
+.task-toolbar .count{display:none!important}
+.task-visibility-btn{
+  position:relative;
+  width:32px;
+  height:28px;
+  padding:0!important;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  border:0!important;
+  background:transparent!important;
+  color:#7180C1!important;
+  box-shadow:none!important;
+}
+.task-visibility-btn:hover{background:#F2F4FB!important}
+.task-visibility-btn svg{width:20px;height:20px;display:block}
+.task-count-badge{
+  position:absolute;
+  right:-2px;
+  bottom:-2px;
+  min-width:15px;
+  height:15px;
+  padding:0 3px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#B45B58;
+  color:#fff;
+  border:2px solid #fff;
+  border-radius:3px;
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+}
+@media(max-width:760px){
+  .feature-row{flex-basis:290px!important;width:290px!important;min-width:290px!important}
+}
+
+
+/* v12: явные полосы вкладок и controls после progress */
+
+/* Строка модулей: отдельная визуальная полоса */
+.module-tabsbar{
+  background:#F5F6F8!important;
+  border-bottom:1px solid #D9DEE5!important;
+  box-shadow:none!important;
+}
+.module-tabs-inner{
+  padding:10px 18px 0!important;
+  background:#F5F6F8!important;
+}
+.module-nav-wrap{
+  overflow-x:auto!important;
+  padding-bottom:0!important;
+  border-bottom:1px solid #7E8FCF;
+}
+.modules-horizontal{
+  display:flex!important;
+  gap:0!important;
+  min-width:max-content!important;
+  padding:0!important;
+}
+.modules-horizontal>li{
+  margin:0!important;
+}
+.modules-horizontal>li>a{
+  min-height:41px;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  padding:10px 18px!important;
+  border:1px solid #7E8FCF!important;
+  border-bottom:0!important;
+  border-right:0!important;
+  background:#FFFFFF!important;
+  color:#7482C0!important;
+  border-radius:0!important;
+  font-size:13px!important;
+  white-space:nowrap;
+}
+.modules-horizontal>li:last-child>a{
+  border-right:1px solid #7E8FCF!important;
+}
+.modules-horizontal>li.active>a{
+  background:#7986C2!important;
+  color:#FFFFFF!important;
+  font-weight:700!important;
+}
+.modules-horizontal>li>a:hover{
+  background:#F0F2FB!important;
+  color:#5D6CAE!important;
+}
+.modules-horizontal>li.active>a:hover{
+  background:#7986C2!important;
+  color:#FFFFFF!important;
+}
+
+/* Вторая строка: вкладки вида "Карта развития / Описание продукта" */
+.module-subtabs-inner{
+  padding:10px 18px!important;
+  background:#FFFFFF!important;
+  border-top:0!important;
+  border-bottom:1px solid #DDE2E8;
+}
+.module-subtabs-inner .nav-tabs{
+  display:inline-flex!important;
+  gap:0!important;
+  margin:0!important;
+  border:0!important;
+}
+.module-subtabs-inner .nav-tabs>li{
+  margin:0!important;
+}
+.module-subtabs-inner .nav-tabs>li>a{
+  min-width:190px;
+  min-height:37px;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  padding:8px 18px!important;
+  border:1px solid #7E8FCF!important;
+  border-right:0!important;
+  border-radius:0!important;
+  color:#7482C0!important;
+  background:#FFFFFF!important;
+  font-size:13px!important;
+}
+.module-subtabs-inner .nav-tabs>li:last-child>a{
+  border-right:1px solid #7E8FCF!important;
+}
+.module-subtabs-inner .nav-tabs>li.active>a{
+  background:#7986C2!important;
+  color:#FFFFFF!important;
+  font-weight:700!important;
+}
+
+/* Progress первым, controls сразу под ним */
+.summary-strip{
+  margin-bottom:0!important;
+  padding:14px 0 13px!important;
+  border-bottom:0!important;
+}
+.module-header{
+  margin:0 0 18px!important;
+  padding:11px 0 13px;
+  border-top:1px solid #E1E5EA;
+  border-bottom:1px solid #E1E5EA;
+  background:#F7F8FA;
+}
+.header-actions{
+  padding:0 10px;
+  justify-content:flex-end!important;
+}
+.searchbox{
+  width:min(480px,48vw)!important;
+  margin-right:auto;
+}
+
+/* Номер задачи как в референсе "Показать код" */
+.task-item .task-id{
+  color:#7583C1!important;
+  font-size:14px!important;
+  font-weight:400!important;
+  line-height:1.35!important;
+  letter-spacing:0!important;
+  margin-right:7px!important;
+}
+
+/* Чтобы контролы не прилипали на мобильных */
+@media(max-width:760px){
+  .module-tabs-inner{padding:8px 10px 0!important}
+  .module-subtabs-inner{padding:8px 10px!important}
+  .module-subtabs-inner .nav-tabs>li>a{min-width:155px}
+  .module-header{padding:10px 0}
+  .header-actions{padding:0}
+  .searchbox{width:100%!important;margin-right:0}
+}
+
+
+/* v13: compact functional row */
+.feature-panel:before{display:none!important;content:none!important}
+.network-root-anchor{display:none!important}
+.network-root-wrap{
+  height:20px!important;
+  min-height:20px!important;
+  margin:0 0 22px!important;
+}
+
+/* Fit functional blocks into one desktop row where practical */
+#roadmapView{
+  overflow-x:auto;
+  overflow-y:visible;
+}
+.network-board{
+  width:100%!important;
+  min-width:max(100%, calc(var(--feature-count, 1) * 168px))!important;
+}
+.feature-grid{
+  display:grid!important;
+  grid-template-columns:repeat(var(--feature-count, 1), minmax(158px, 1fr))!important;
+  gap:14px!important;
+  width:100%!important;
+  min-width:calc(var(--feature-count, 1) * 168px)!important;
+  padding:0 2px 12px!important;
+}
+.feature-row{
+  width:auto!important;
+  min-width:0!important;
+  flex:initial!important;
+}
+.feature-panel .panel-heading{
+  padding:9px 9px 4px!important;
+  min-height:52px;
+}
+.feature-panel .panel-title{
+  font-size:12.5px!important;
+  line-height:1.25!important;
+  overflow-wrap:anywhere;
+}
+.feature-panel .panel-body{
+  padding:4px 9px 9px!important;
+}
+.feature-tags{
+  gap:4px!important;
+}
+.label{
+  padding:3px 8px!important;
+  min-height:22px!important;
+  font-size:10.5px!important;
+}
+.label-circle{
+  width:28px!important;
+  height:28px!important;
+  flex-basis:28px!important;
+  font-size:12px!important;
+}
+.task-item{
+  padding-left:8px!important;
+  padding-right:72px!important;
+  font-size:11.5px!important;
+}
+.task-item .task-id{
+  font-size:12.5px!important;
+}
+@media(max-width:1200px){
+  .feature-grid{
+    grid-template-columns:repeat(var(--feature-count, 1), minmax(150px, 1fr))!important;
+    min-width:calc(var(--feature-count, 1) * 160px)!important;
+  }
+}
+
+
+/* v14: module tabs like reference */
+.module-tabsbar{
+  background:#fff!important;
+  border-bottom:1px solid #D9DEE5!important;
+}
+.module-tabs-inner{
+  padding:8px 10px 0!important;
+  background:#fff!important;
+}
+.module-nav-wrap{
+  border-bottom:1px solid #D9DEE5!important;
+  padding-bottom:0!important;
+}
+.modules-horizontal{
+  display:flex!important;
+  gap:2px!important;
+  padding:0!important;
+  min-width:max-content!important;
+}
+.modules-horizontal>li{
+  margin:0!important;
+}
+.modules-horizontal>li>a{
+  min-height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:10px 24px!important;
+  background:#F3F3F4!important;
+  color:#202936!important;
+  border:0!important;
+  border-bottom:3px solid transparent!important;
+  border-radius:0!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  white-space:nowrap!important;
+}
+.modules-horizontal>li>a:hover{
+  background:#ECEEF3!important;
+  color:#5F6FB4!important;
+}
+.modules-horizontal>li.active>a{
+  background:#EEF1FB!important;
+  color:#6F7FC1!important;
+  border-bottom-color:#7886C4!important;
+  font-weight:700!important;
+}
+.modules-horizontal>li.active>a:hover{
+  background:#EEF1FB!important;
+  color:#6F7FC1!important;
+}
+
 </style>
 </head>
 <body>
@@ -231,18 +808,24 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
         </div>
       </div>
       <h1>DNM · карта развития продуктов</h1>
-      <small>иерархия планируемых и закрытых доработок</small>
+      
     </div>
     <div class="toolbar">
-      <span id="saveState" class="save-state">Исходные данные</span>
-      <div class="btn-group" role="group" aria-label="Редактирование">
-        <button id="editToggle" class="btn btn-primary">Редактировать</button>
-        <button id="exportCsv" class="btn btn-default">CSV</button>
-        <button id="exportJson" class="btn btn-default">JSON</button>
+      <button id="editToggle" class="btn btn-primary">Редактировать</button>
+      <div class="dropdown actions-dropdown">
+        <button id="actionsToggle" class="btn btn-primary">Действия</button>
+        <div id="actionsMenu" class="actions-menu">
+          <button id="exportCsvAction" class="actions-item" type="button">Выгрузить Excel (CSV)</button>
+          <button id="importCsvAction" class="actions-item" type="button">Загрузить Excel (CSV)</button>
+          <div class="actions-divider"></div>
+          <button id="exportJsonAction" class="actions-item" type="button">Выгрузить JSON</button>
+          <button id="importJsonAction" class="actions-item" type="button">Загрузить JSON</button>
+          <div class="actions-divider"></div>
+          <button id="resetAction" class="actions-item danger" type="button">Сбросить данные</button>
+        </div>
       </div>
-      <button id="importJsonBtn" class="btn btn-default">Импорт</button>
       <input id="importJson" type="file" accept=".json,application/json" hidden>
-      <button id="resetBtn" class="btn btn-danger">Сбросить</button>
+      <input id="importCsv" type="file" accept=".csv,text/csv" hidden>
     </div>
   </div>
 </header>
@@ -254,29 +837,28 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
       <ul id="moduleNav" class="nav nav-pills modules-horizontal"></ul>
     </div>
   </div>
+  <div class="module-subtabs-inner">
+    <ul id="moduleViewTabs" class="nav nav-tabs">
+      <li class="active"><a href="#" data-view="roadmap">Карта развития</a></li>
+      <li><a href="#" data-view="description">Описание продукта</a></li>
+    </ul>
+  </div>
 </div>
 
 <div class="shell">
 
   <main class="main">
+    <div id="summaryStrip" class="summary-strip"></div>
+
     <div class="module-header">
-      <div class="module-header-title">
-        <h2 id="moduleTitle"></h2>
-        <div id="moduleMeta" class="module-meta"></div>
-      </div>
       <div class="header-actions">
         <div class="input-group searchbox">
           <span class="input-group-addon">⌕</span>
-          <input id="searchInput" class="form-control" type="search" placeholder="Найти Ф-л или доработку">
+          <input id="searchInput" class="form-control" type="search" placeholder="Найти функционал или доработку">
         </div>
-        <label class="btn btn-default"><input id="showClosed" type="checkbox" checked style="margin-right:6px">Закрытые</label>
-        <button id="editModuleBtn" class="btn btn-default edit-module">Изменить модуль</button>
-      </div>
-    </div>
-
-    <div id="summaryStrip" class="summary-strip"></div>
 
 
+    <div id="roadmapView">
     <div id="networkBoard" class="network-board">
       <svg id="networkSvg" class="network-svg" aria-hidden="true">
         <defs>
@@ -285,18 +867,27 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
           </marker>
         </defs>
       </svg>
-      <div class="network-root-wrap">
-        <div id="networkRoot" class="network-root">
-          <div>
-            <div id="rootTitle" class="root-title"></div>
-            <div class="root-kicker">Dealer Network Management / продуктовый контур</div>
-          </div>
-        </div>
+      <div class="drag-help">Чтобы изменить порядок функциональных блоков, зажмите <strong>«↕ Перетащить»</strong> на нужном блоке и перенесите его на новое место.</div>
+      <div class="network-root-wrap" aria-hidden="true">
+        <div id="networkRoot" class="network-root-anchor"></div>
       </div>
       <div id="featureRows" class="feature-grid"></div>
       <div class="add-feature-wrap">
-        <button id="addFeatureBtn" class="btn btn-default add-feature">Добавить Ф-л</button>
+        <button id="addFeatureBtn" class="btn btn-default add-feature">Добавить функционал</button>
       </div>
+    </div>
+    </div>
+
+    <div id="descriptionView" class="product-description view-hidden">
+      <div class="product-description-head">
+        <div>
+          <h3>Описание продукта</h3>
+          <p>Содержание перенесено из «Продуктовый план(1).xlsx»</p>
+        </div>
+        <button id="editDescriptionBtn" class="btn btn-default description-edit">Изменить описание</button>
+      </div>
+      <div id="descriptionGrid" class="description-grid"></div>
+      <div class="description-source">Источник: «Продуктовый план(1).xlsx». Если раздел отсутствовал в исходном плане, это явно указано в тексте.</div>
     </div>
   </main>
 </div>
@@ -309,21 +900,71 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 <div id="modalBackdrop" class="modal-backdrop"></div>
 <div id="modal" class="modal" role="dialog" aria-modal="true"><div class="modal-dialog"><div id="modalContent" class="modal-content"></div></div></div>
 
+<script id="productDescriptions" type="application/json">{"Анализ трафика": {"users": "Региональный менеджер и маркетинг дистрибьютора, менеджер и оператор контакт-центра дилера.", "beneficiaries": "Дистрибьютор, руководство дилера.", "area": "Обработка и контроль лидов в LMS, анализ качества входящего трафика и фактической работы дилера с обращениями клиентов.", "functional": "DNM фиксирует звонки по лидам. ИИ переводит записи разговоров в текст, формирует краткую выжимку и проводит комплексный анализ качества работы дилера и качества самого лида.", "benefits": "Дистрибьютор получает подтверждение фактической обработки лида, видит качество трафика и источники накрутки, выявляет фальсификации результатов, контролирует стандарты, обогащает данные по клиенту и выявляет недовольство. Дилер получает инструмент для выявления сотрудников, которые некорректно обрабатывают лиды. Без модуля растут потери времени на спам-лиды, снижается конверсия и сложнее выявлять системное недовольство клиентов.", "competitors": "Calltouch: транскрибация и оценка звонков по чек-листу.", "usp": "DNM анализирует не только звонок и чек-лист, но и данные рабочего листа, выполняет скоринг лида на спам и формирует анкету звонка. Можно сопоставить результат, указанный дилером, с результатом, определённым по разговору. В продуктовом плане отдельно отмечен маскинг номеров вместо сценария обратного звонка."}, "Автопроверка": {"users": "Сотрудники дистрибьютора, проверяющие заявки и документы; дилерские пользователи, загружающие документы; юридические и маркетинговые подразделения; сотрудники, работающие с СОПД.", "beneficiaries": "Дистрибьютор, дилеры, юридическая служба, сотрудники сети, клиенты в части корректного документооборота и СОПД.", "area": "Автоматическая проверка документов и данных в процессах компенсаций, маркетинговых размещений и мероприятий, гарантийных ремонтов, а также сбор, проверка и хранение СОПД и согласий на коммуникацию по дилерской сети.", "functional": "Для заявок на компенсацию система автоматически запускает проверку на заданном этапе: распознаёт документы через OCR, сохраняет данные в JSON, сверяет данные системы с документами, при необходимости извлекает дополнительные поля и использует ИИ для проверки каждого пункта чек-листа. Ошибочная заявка возвращается дилеру либо уходит на ручную перепроверку. Дистрибьютор видит статусы, причины отклонений и аналитику.\n\nДля СОПД дистрибьютор задаёт единую форму, дилер формирует и подписывает анкету, загружает скан, QR связывает скан с электронной анкетой, а ИИ проверяет данные, отметки согласий и подпись. Результат сохраняется в карточке клиента.", "benefits": "Для дистрибьютора: контроль документов на 100% заявок, снижение ручной нагрузки и ФОТ, уменьшение человеческого фактора и фрода, единый стандарт документооборота, снижение юридических рисков и прозрачность причин отклонений. Для дилера: более быстрое согласование, понятные требования и ошибки, меньше возвратов и задержек выплат. В СОПД дополнительно: единое хранилище, переиспользование согласий между ДЦ и снижение ручного ввода.", "competitors": "Авто.ру, Автохаб; для маркетинговой проверки — также маркетинговые агентства, выполняющие контроль вручную. Для части сервисных и СОПД-сценариев в продуктовом плане прямой полноценный аналог не указан.", "usp": "Цена 3 000–5 000 руб. в зависимости от объёма; по отзывам клиентов — более высокое качество проверки; прозрачный результат по каждому критерию вместо общего комментария; встроенность в бизнес-процесс DNM и связанные модули; возможность автоматически возвращать заявку; гибкая настройка отдельного алгоритма под каждый критерий."}, "AI-ассистент мастера приёмщика": {"users": "Сервисный консультант, мастер-приёмщик.", "beneficiaries": "Дилер, дистрибьютор, сервисное подразделение, клиент за счёт более персонализированного обслуживания.", "area": "Послепродажное обслуживание и удержание клиентов: подготовка к встрече или звонку, планирование ТО, работа с невыполненными рекомендациями, информирование о сервисных кампаниях и персонализированные допродажи.", "functional": "Модуль собирает по VIN историю заказ-нарядов, пробеги, гарантийные обращения, рекомендации, кампании и другие данные. Затем оценивает профиль и лояльность клиента, прогнозирует следующий визит, выделяет критичные невыполненные рекомендации, проверяет сервисные кампании и формирует персонализированные предложения. На выходе создаётся структурированный брифинг с готовыми подсказками для разговора.", "benefits": "Дилер экономит время мастера, повышает средний чек за счёт рекомендаций и дополнительных услуг, персонализирует визит и снижает зависимость от опыта конкретного сотрудника. Дистрибьютор получает единый стандарт приёма по сети, более своевременную работу с сервисными кампаниями и более единый клиентский опыт.", "competitors": "В продуктовом плане прямые аналоги не выявлены.", "usp": "Отдельный блок УТП в продуктовом плане не заполнен. В описании продукта акцент сделан на автоматическом анализе полной истории автомобиля и клиента и формировании готового персонального брифинга для мастера."}, "Модуль обучения": {"users": "Отдел обучения / HR / бизнес-академия импортёра, руководители направлений, ответственные за обучение в ДЦ, руководители отделов, сотрудники дилерской сети.", "beneficiaries": "Дистрибьютор, дилеры, сотрудники сети, руководители направлений и HR.", "area": "Обучение, аттестация и развитие сотрудников дилерской сети в онлайн- и офлайн-форматах, включая KPI и сертификацию.", "functional": "Импортёр создаёт курсы, тесты и материалы, формирует сертификационные пути и планы обучения по должностям. Онлайн-курсы могут назначаться автоматически по роли и должности. Очные мероприятия используют отдельный процесс регистрации. Сотрудник проходит материалы и тесты, система фиксирует результаты, рассчитывает KPI и формирует отчётность, а импортёр видит аналитику по дилерам, сотрудникам и курсам.", "benefits": "Для дистрибьютора: повышение качества работы сети, снижение потерь от ошибок сотрудников, уменьшение затрат на обучение и ручное администрирование, единая статистика и прозрачность KPI, быстрый запуск обучения на всю сеть и аудит актуальности пользователей. Для дилера: снижение затрат на обучение и адаптацию, удобная запись на тренинги и быстрый доступ к материалам. Для сотрудника: понятный путь развития и прозрачные требования.", "competitors": "Mirapolis, iSpring.", "usp": "Персонал уже ведётся в DNM — не нужна отдельная синхронизация пользователей; гибкая схема оплаты; нет лимита пользователей; поддержка дилера и импортёра; более короткие сроки доработок; аудит пользователей по корпоративной почте; автоматический сбор статистики по вебинарам; результаты обучения находятся в одной системе с рабочими показателями персонала."}, "База знаний + ИИ": {"users": "Механики, мастера-консультанты, диагносты, РОПы, продавцы, HR, бренд- и региональные менеджеры.", "beneficiaries": "Дистрибьютор, дилеры, сотрудники сервиса и продаж, HR и обучение.", "area": "Техническая поддержка дилеров, гарантийное и постгарантийное обслуживание, обучение сотрудников и контроль корпоративных политик и регламентов.", "functional": "Дистрибьютор загружает документы в DNM, назначает теги и права доступа. Сервис распознаёт и индексирует содержимое в RAG-движке, а устаревшие версии деиндексируются. Пользователь задаёт вопрос естественным языком; система определяет контекст, применяет фильтры по модели, разделу и ACL и формирует ответ на основе разрешённых документов с обязательными ссылками на конкретные страницы источников.", "benefits": "Дистрибьютор обеспечивает работу по актуальным регламентам, разграничивает доступ к чувствительной информации и сокращает трудозатраты на onboarding. Дилер быстрее находит нужные инструкции, снижает риск ошибок из-за устаревших документов и работает в привычном интерфейсе DNM без отдельного софта.", "competitors": "Облачные ИИ с загрузкой документов; YandexGPT + Vector Search.", "usp": "RAG-поиск встроен в экосистему дистрибьютора и дилера, понимает бизнес-контекст, бренды и модели, учитывает сложные теги и права пользователей. Ответ ограничен корпоративной базой и подкрепляется точной ссылкой на первоисточник."}, "Модуль рассылок для дилеров": {"users": "Маркетинг, бренд- и CRM-менеджеры дистрибьютора и дилера.", "beneficiaries": "Дистрибьютор, дилеры, маркетинговые подразделения, клиенты за счёт более корректных и согласованных коммуникаций.", "area": "Дилерский маркетинг и контроль маркетинговых стандартов дистрибьютором. Дилер запускает массовые рассылки по своей клиентской базе после модерации брендом.", "functional": "DNM/CRM дедублицирует клиентские данные и формирует «золотую карточку клиента» с актуальным согласием на коммуникацию. Дилер создаёт письмо в визуальном конструкторе на базе утверждённых материалов, отправляет его на согласование по workflow, а после одобрения запускает рассылку по согласованному сегменту.", "benefits": "Дистрибьютор контролирует соответствие писем стандартам бренда и видит активность дилеров по сети. Дилер получает более чистую базу без дублей, профессиональные шаблоны и работу только с подтверждёнными согласиями. Это снижает репутационные и юридические риски и повышает качество коммуникаций.", "competitors": "Маркетинговые агентства; Unisender; Mindbox.", "usp": "Не только отправка писем, а замкнутый процесс: дедубликация клиента в DNM, работа с согласиями, конструктор, брендовые материалы и workflow согласования с дистрибьютором."}, "Мобильное приложение DNM/CRM": {"users": "Менеджеры по продажам, мастера-приёмщики, сервисные консультанты, склад, руководители, региональные менеджеры, аудиторы.", "beneficiaries": "Дистрибьютор, дилеры, сотрудники фронт-офиса и сервиса, аудиторы и руководители.", "area": "Продажи, сервис, складской учёт и контроль качества: лиды и рабочие листы, приёмка и заказ-наряды, история по VIN, чек-листы и PDI.", "functional": "Мобильное PWA-приложение является продолжением DNM/CRM и показывает доступные пользователю модули по его правам. Интегрированная телефония работает через Voximplant, а при звонке система автоматически открывает связанный бизнес-контекст: лид, рабочий лист, заказ-наряд или историю по VIN. В полях можно заполнять чек-листы, фиксировать фото и PDI с мгновенной синхронизацией с основной системой.", "benefits": "Дистрибьютор получает мобильный доступ к сквозной истории и контролю стандартов по сети. Дилер сокращает перемещения к стационарному ПК, вводит данные непосредственно у автомобиля или клиента, получает контекст при звонке и работает в одном мобильном окне вместо разрозненных инструментов.", "competitors": "Мобильные софтфоны — без бизнес-контекста DNM. В продуктовом плане полноценный мобильный аналог CRM для автодистрибьютора и дилера, интегрированный во все процессы, не указан; теоретическая альтернатива — дорогое кастомное приложение ДЦ через API.", "usp": "Мобильное приложение является прямым продолжением CRM/DNM, а не отдельным инструментом. Оно объединяет продажи, сервис, склад и аудит, а телефония автоматически определяет контекст клиента и открывает нужную сущность системы."}, "Умный центр диалогов": {"users": "В продуктовом плане не заполнено.", "beneficiaries": "В продуктовом плане не заполнено.", "area": "В продуктовом плане не заполнено.", "functional": "В продуктовом плане не заполнено.", "benefits": "В продуктовом плане не заполнено.", "competitors": "В продуктовом плане не заполнено.", "usp": "В продуктовом плане не заполнено."}, "Контакт-центр (CRM)": {"users": "Операторы контакт-центра, менеджеры, ресепшн; маркетинг и руководители используют аналитику.", "beneficiaries": "Дилер, дистрибьютор, контакт-центр, маркетинг, руководители подразделений.", "area": "Обработка входящего трафика и коммуникаций с клиентами в едином контуре: звонки, чаты и заявки.", "functional": "Лиды создаются автоматически из входящих каналов, фиксируется источник. Для чатов предусмотрена автоматизация: автоответы, автоматическое закрытие при отсутствии ответа и дальнейшее развитие AI-коммуникаций. Ответственные обрабатывают лиды и переписку, а DNM формирует статистику по источникам, подразделениям, отказам и обработке обращений.", "benefits": "Дилер снижает потери обращений, повышает эффективность обработки и получает более прозрачную картину входящего трафика. Продуктовый план отдельно фиксирует проблему разрыва между маркетинговой аналитикой и реальными рабочими листами, а также стоимость потерянных целевых обращений.", "competitors": "Бачата, Talk-me, Callibri, Chat2desk, Wazzup; электронная почта для заявок; Calltouch в части статического коллтрекинга.", "usp": "Связка обращений с рабочими листами и клиентами DNM; единое окно для чатов, звонков и заявок; статический коллтрекинг на номерах телефонии клиента; более полные данные для аналитики; развитие автоматической обработки и маршрутизации трафика."}, "Предодобрение кредита Сбербанк в DNM": {"users": "Маркетинг дистрибьютора, менеджер дилера.", "beneficiaries": "Дистрибьютор, дилеры, клиенты в части ускорения кредитного процесса.", "area": "Обработка лидов в LMS и триггерные коммуникации с клиентом в кредитном сценарии.", "functional": "При создании лида DNM передаёт в Сбербанк номер телефона клиента, бренд и модель автомобиля. Банк возвращает предодобренный кредитный лимит, который отображается менеджеру в лиде; клиент при необходимости завершает оформление в приложении банка. Второй сценарий — триггерная коммуникация после сервисного визита при выполнении заданных условий.", "benefits": "В продуктовом плане этот раздел заполнен текстом, относящимся к контролю обработки лидов и анализу трафика: подтверждение фактической обработки лида, выявление фрода и качества источников, контроль стандартов. Для кредитного продукта блок требует отдельной актуализации.", "competitors": "В продуктовом плане указан Calltouch, однако этот блок по смыслу относится к «Анализу трафика» и требует актуализации для кредитного сценария.", "usp": "В продуктовом плане приведены преимущества анализа трафика: совместный анализ звонка и рабочего листа, спам-скоринг, сравнение результата дилера с разговором и маскинг номеров. Для предодобрения кредита отдельное УТП в источнике не сформулировано."}, "Модуль In-App продаж": {"users": "В продуктовом плане не заполнено.", "beneficiaries": "В продуктовом плане не заполнено.", "area": "Внутренний маркетплейс / витрина приложений и дополнительных сервисов внутри DNM/CRM.", "functional": "Зафиксированы гипотезы: витрина приложений и дополнительных сервисов внутри DNM/CRM, полная автоматизация процесса запроса/продажи, подтверждение заказа ЛПР заказчика, автоматический onboarding, отчёт по просмотрам, лидам и конверсии.", "benefits": "В продуктовом плане отдельный блок выгод пока не заполнен.", "competitors": "В продуктовом плане не заполнено.", "usp": "В продуктовом плане не заполнено."}, "Лид-расчет-рекомендации в ОП по клиенту записанному на сервис": {"users": "Сотрудники отдела продаж, работающие с клиентами, записанными на сервис.", "beneficiaries": "Дилер, отдел продаж, дистрибьютор.", "area": "Работа с клиентами, записанными на сервис, и поиск потенциала продажи / обмена автомобиля с передачей рекомендации в отдел продаж.", "functional": "ИИ анализирует будущую запись на сервис по вероятности обмена автомобиля на основе набора параметров и формирует индивидуальное коммерческое предложение с вариантами обмена на базе реального склада автомобилей.", "benefits": "В продуктовом плане указана гипотеза достижения конверсии до 1,5% от общего числа машино-заездов в месяц на старте за счёт более результативного подхода к клиенту.", "competitors": "В продуктовом плане не заполнено.", "usp": "В продуктовом плане отдельный блок УТП не заполнен."}, "Анализ оттока клиентов из сервиса": {"users": "Сотрудники сервисного подразделения дилера, сотрудники, работающие с удержанием клиентов.", "beneficiaries": "Исходный дилерский центр, дистрибьютор, сервисные подразделения.", "area": "Контроль и анализ клиентов, которые приезжают на обслуживание не в свой дилерский центр.", "functional": "DNM получает заказ-наряд по заезду клиента в другой ДЦ, по триггеру отправляет опрос с выяснением причин, после чего исходный ДЦ получает обезличенную информацию по результатам опроса.", "benefits": "Даёт исходному дилерскому центру фактические причины ухода клиента на обслуживание в другой ДЦ и данные для работы с удержанием.", "competitors": "В продуктовом плане не заполнено.", "usp": "В продуктовом плане не заполнено."}}</script>
 <script id="initialData" type="application/json">[{"name":"Анализ трафика","features":[{"name":"Охват и автоматизация обработки трафика","why":"Закрывает потери обращений вне текущего контура контроля, снижает ручную обработку лидов и позволяет видеть полный путь обращения до РЛ/ЗН.","monetization":"Высокий. Расширяет объём платно обрабатываемого трафика и число сценариев, где можно тарифицировать AI-анализ, коллтрекинг и автоматическую обработку обращений.","tasks":[{"number":"","status":"Планируется","title":"Расширить AI-анализ на все входящие звонки: перевести прямые звонки Voximplant и Calltouch в журнал звонков, определять целевой/нецелевой звонок и департамент."},{"number":"54451","status":"Очередь","title":"callback/телефонное уведомление по неотработанным лидам."},{"number":"51533","status":"Backlog","title":"определение автоинформаторов/роботов."},{"number":"45182","status":"Backlog","title":"определение автоинформаторов/роботов."},{"number":"53433","status":"Backlog","title":"запуск автозакрытия и проверки условий при фактическом сопоставлении лида с РЛ/ЗН."},{"number":"53885","status":"Закрыто","title":"LMS, анализ трафика, ДБ дилера"},{"number":"52729","status":"Закрыто","title":"ДБ дилера, рекомендации ИИ по работе с LMS"},{"number":"53803","status":"Закрыто","title":"LMS, анализ трафика, доработки и баги"},{"number":"21808","status":"Закрыто","title":"Анализ трафика, упрощение настройки модуля"},{"number":"53533","status":"Закрыто","title":"LMS, AI анализ, мелкие доработки"},{"number":"53431","status":"Закрыто","title":"LMS, список лидов, фильтры"},{"number":"51534","status":"Закрыто","title":"Запуск ИИ анализа трафика на Exeed"},{"number":"52325","status":"Закрыто","title":"LMS, карточка лида"},{"number":"48566","status":"Закрыто","title":"Вывод данных ИИ ассистента по LMS на дэшбоарде дилера"},{"number":"21208","status":"Закрыто","title":"Админка, выбор модели транскрибации и анализа"},{"number":"50218","status":"Закрыто","title":"Предоставить дилеру возможность менять код ДЦ в лиде в рамках холдинга."},{"number":"50064","status":"Закрыто","title":"Изменить вид фильтра по моделям (алиасам) в DNM"},{"number":"49482","status":"Закрыто","title":"Набор номера в лиде LMS через QR"},{"number":"48213","status":"Закрыто","title":"Анализ трафика ИИ. Сервисные лиды. Определение факта записи"},{"number":"48922","status":"Закрыто","title":"Добавление ключей. ИИ ассистент."},{"number":"48611","status":"Закрыто","title":"Анализ причин недовольства клиентов в модуле Анализ трафика ИИ"},{"number":"48605","status":"Закрыто","title":"Выгрузка лидов"},{"number":"48514","status":"Закрыто","title":"Добавить возможность копировать ЦО и дилера из родительского лида в диспетчере \"Создание связанного лида...\""},{"number":"47563","status":"Закрыто","title":"LMS, список лидов, выгрузка в excel"},{"number":"47603","status":"Закрыто","title":"Список лидов, долгая загрузка"},{"number":"19996","status":"Закрыто","title":"Лиды LMS не отображаются на главной странице у корп. менеджеров и корп. роп."},{"number":"46890","status":"Закрыто","title":"Скоринг лидов, обновить вывод данных в тултипе"},{"number":"45526","status":"Закрыто","title":"Косяк с закрытием лида при получении статуса Voximplant"},{"number":"45179","status":"Закрыто","title":"Анализ трафика ИИ, классификация, флаг Перенос звонка"},{"number":"44799","status":"Закрыто","title":"Передача данных по результатам AI анализа лида через API"},{"number":"44054","status":"Закрыто","title":"Выгрузка лидов"},{"number":"43916","status":"Закрыто","title":"LMS, фильтр"}]},{"name":"Антиспам и антифрод","why":"Убирает заведомо некачественные обращения из работы дилера и делает оценку эффективности рекламных каналов достовернее.","monetization":"Высокий. Даёт прямую экономию маркетингового бюджета и времени дилеров на некачественные лиды; ценность легко показать в деньгах и продавать как отдельную AI-функцию.","tasks":[{"number":"","status":"Планируется","title":"Доработать скоринг по IP и глобальную базу подтвержденных источников спама; автоматически предобрабатывать спам-лиды до передачи дилеру."},{"number":"48105","status":"Закрыто","title":"Скоринг лидов на спам, доработка логики"},{"number":"44809","status":"Закрыто","title":"Скоринг лидов на СПАМ"}]},{"name":"Аналитика и контроль качества","why":"Позволяет видеть проблемы не только на уровне ДЦ, но и по сотрудникам и реальной конверсии, а также использовать AI-контроль в ежедневном управлении сетью.","monetization":"Высокий. Напрямую влияет на конверсию и управляемость дилерской сети; расширенную аналитику и контроль по сотрудникам можно монетизировать как premium-функционал.","tasks":[{"number":"21798","status":"Code review","title":"вывести на ДБ дилера трафик, невзятые лиды/РЛ и AI-оценку звонков."},{"number":"","status":"Планируется","title":"Добавить рекомендации дилеру и отчет директору на почту."},{"number":"","status":"Планируется","title":"Добавить разбивку статистики ЧЛ по менеджерам."},{"number":"54795","status":"Обсуждение и оценка DNM","title":"фиксировать фактического менеджера в лиде для персональной аналитики."},{"number":"","status":"Планируется","title":"Показывать покупки в другом ДЦ и связывать их с качеством обработки исходного лида."},{"number":"54908","status":"На проверке постановщиком","title":"учитывать косвенную конверсию в модалке AI-оценки."},{"number":"52746","status":"Закрыто","title":"LMS, оперативная статистика по лидам"},{"number":"53384","status":"Закрыто","title":"LMS, AI анализ, чек-лист, вывод в списке"},{"number":"53367","status":"Закрыто","title":"LMS, AI анализ, анкета"},{"number":"21652","status":"Закрыто","title":"AI анализ, отчет по оценкам по ЧЛ"},{"number":"21610","status":"Закрыто","title":"AI анализ звонков, определение персоналий для блоков в ЧЛ по оценке"},{"number":"52323","status":"Закрыто","title":"LMS, оперативная статистика по лидам"},{"number":"21340","status":"Закрыто","title":"AI ассистент, модальное окно. Блок квалификации"},{"number":"21337","status":"Закрыто","title":"AI чек-лист, возможность добавления переменных в промпт"},{"number":"21335","status":"Закрыто","title":"Верстка модального окна речевой аналитики"},{"number":"49869","status":"Закрыто","title":"Косвенная конверсия из лидов в РЛ и продажи"},{"number":"49561","status":"Закрыто","title":"LMS, список лидов фильтр, Отчет по коллтрекингу фильтр"},{"number":"49116","status":"Закрыто","title":"Отчеты, LMS, отчет по коллтрекингу"},{"number":"48615","status":"Закрыто","title":"Результаты оценки ЧЛ по звонкам, вероятная проблема с подсчетом %"},{"number":"48785","status":"Закрыто","title":"Отчеты, LMS, Отчет по коллтрекингу"},{"number":"45610","status":"Закрыто","title":"LMS, оперативная статистика по лидам"},{"number":"45412","status":"Закрыто","title":"Список лидов, вывод оценки разговора"},{"number":"45512","status":"Закрыто","title":"Обновление ЧЛ из шаблона + перезапуск ИИ на Haval"},{"number":"44055","status":"Закрыто","title":"LMS, отчет по коллтрекингу"},{"number":"43827","status":"Закрыто","title":"Дашборд по конверсии обращений. Фильтрация по кампаниям."}]},{"name":"Уведомления и диагностика","why":"Снижает риск пропуска проблемных лидов и ускоряет разбор сбоев AI-обработки без постоянного привлечения разработчика.","monetization":"Низкий. Повышает надёжность и удобство эксплуатации модуля, но клиент обычно воспринимает это как базовое качество продукта, а не отдельную платную ценность.","tasks":[{"number":"","status":"Планируется","title":"Настроить подписку из карточки лида и отдельный контроль уведомлений; добавить отчет руководству."},{"number":"50001","status":"Обсуждение и оценка DNM","title":"пользовательская страница настроек уведомлений LMS/каналов."},{"number":"21711","status":"Backlog","title":"служебная модалка транскрибации с диагностикой этапов обработки и повторным запуском действий."},{"number":"49319","status":"Закрыто","title":"Исправить ошибку при экспорте лидов"}]}]},{"name":"Автопроверка","features":[{"name":"OCR и модели распознавания","why":"Повышает точность и прозрачность проверок, снижает стоимость AI-обработки и позволяет шире использовать локальные модели для конфиденциальных данных.","monetization":"Высокий. Это ядро автопроверки: рост точности и доли автоматической обработки позволяет масштабировать проверки документов и тарифицировать их по объёму.","tasks":[{"number":"54183","status":"Очередь","title":"плейсхолдеры извлекаемых OCR-данных."},{"number":"50634","status":"Backlog","title":"проверка OCR."},{"number":"52359","status":"Backlog","title":"исправить кейсы неверно извлеченных данных."},{"number":"54184","status":"Backlog","title":"единый «+» и модалки по типам данных для выбора плейсхолдеров в настройке ЧЛ."},{"number":"48090","status":"Backlog","title":"валидация документа при загрузке легкими моделями."},{"number":"45483","status":"Backlog","title":"проверить распознавание паспорта Internal OCR."},{"number":"","status":"Планируется","title":"Развивать локальную обработку персональных данных."},{"number":"53646","status":"Обсуждение и оценка DNM","title":"выгрузка данных для дообучения модели."},{"number":"54045","status":"Закрыто","title":"Автопроверка / резервная модель на случай системной ошибки"},{"number":"52268","status":"Закрыто","title":"Настроить отражение текста  в новых OCR моделях ПТС, СТС, паспорта"},{"number":"48823","status":"Закрыто","title":"Легкая модель для валидации документа при приложения. Тестирование модели."},{"number":"52016","status":"Закрыто","title":"Отдавать в совместимый маршрут текст документа по OCR"},{"number":"48817","status":"Закрыто","title":"Унификация вывода по поставщику Инфотек OCR"},{"number":"49433","status":"Закрыто","title":"Анализ извлеченных метаданных алгоритмами DNM"},{"number":"43792","status":"Закрыто","title":"Проверка печатей через Internal OCR AI"},{"number":"51391","status":"Закрыто","title":"Автопроверка. Вывести метаданных документов в интерфейс заявки по каждому документу отдельно"},{"number":"49427","status":"Закрыто","title":"Подключение моделей для типов документов: паспорт/СТС/ПТС"},{"number":"49430","status":"Закрыто","title":"Автопроверка. Вывести метаданные документа в интерфейс заявки"},{"number":"49428","status":"Закрыто","title":"Развернуть веб-интерфейс для взаимодействия с языковыми моделями"},{"number":"49834","status":"Закрыто","title":"Не во всех ситуациях по конкретному документу проводится повторный OCR с другой моделью."},{"number":"49551","status":"Закрыто","title":"Автопроверка. При повторном OCR на распознавание отправляются и те файлы, по которым поисковые проверки были успешны."},{"number":"45827","status":"Закрыто","title":"Модели OCR"},{"number":"46078","status":"Закрыто","title":"Проверить наличие легких моделей для валидации документа"},{"number":"45671","status":"Закрыто","title":"Подключение Internal OCR и перевод автопроверок на асинхронный режим"},{"number":"47912","status":"Закрыто","title":"Ошибка при попытке заведения моделей не OPen AI в реф"},{"number":"47043","status":"Закрыто","title":"Автопроверка / выбор модели, переключение на реф. базу"},{"number":"236","status":"Закрыто","title":"Вынести модели и поставщиков OCR в реф"},{"number":"43808","status":"Закрыто","title":"Выгрузка документов для обучения модели"},{"number":"44203","status":"Закрыто","title":"Ошибка по объему промпта, убрать не распознанные значения"}]},{"name":"Интерфейс и ручная проверка","why":"Сокращает время контролера на переключения и повторный поиск информации и делает фактические трудозатраты ручной проверки измеримыми.","monetization":"Средний. Снижает трудозатраты контролёров и повышает удобство продукта, но самостоятельная готовность платить обычно ниже, чем за саму автоматическую проверку.","tasks":[{"number":"49664","status":"Аналитика и проработка","title":"новая часть интерфейса ручной проверки."},{"number":"53585","status":"Backlog","title":"метаданные и тексты системных ошибок."},{"number":"51537","status":"Backlog","title":"связанные задачи реф по сущности."},{"number":"44467","status":"Backlog","title":"группировать документы по типу и отдельно выводить общие проверки по группе."},{"number":"51538","status":"Backlog","title":"пауза в ручной проверке и передача фактического времени в реф."},{"number":"324","status":"Закрыто","title":"Новые поля в реф базе в разделе \"Задачи ручной проверки\" и API"},{"number":"53655","status":"Закрыто","title":"Автопроверка: добавить в модальное окно ручной проверки доп. инфо о системных ошибках"},{"number":"52709","status":"Закрыто","title":"Изменить интерфейс чек-листа ручной проверки"},{"number":"52705","status":"Закрыто","title":"Автопроверка / Оптимизировать открытие модального окна ручной проверки"},{"number":"50373","status":"Закрыто","title":"Автопроверка: предпросмотр документов в ЧЛ ручной проверки"},{"number":"51515","status":"Закрыто","title":"Дублирование запросов в реф при смене этапа через ЧЛ ручной проверки"},{"number":"50472","status":"Закрыто","title":"История изменений в модуле Автопроверка"},{"number":"44149","status":"Закрыто","title":"Редизайн интерфейса ручной проверки"}]},{"name":"Настройка и автоматизация проверки","why":"Позволяет применять проверки только там, где они действительно нужны, и автоматически управлять дальнейшим процессом по результату проверки.","monetization":"Высокий. Позволяет заменить ручные действия автоматическими сценариями и workflow; экономия ФОТ и времени хорошо измеряется и поддерживает более высокий тариф.","tasks":[{"number":"53650","status":"Backlog","title":"деактивация пунктов проверки."},{"number":"53097","status":"Backlog","title":"деактивация пунктов проверки для отдельных источников."},{"number":"51402","status":"Реализовано","title":"создание задач в реф при переводе на этап."},{"number":"51620","status":"Backlog","title":"перевод на этап Workflow по условиям."},{"number":"52410","status":"Backlog","title":"дополнительный статус автопроверки."},{"number":"53649","status":"Закрыто","title":"Автопроверка: добавить шаблоны переменных для промптов чек-листа"},{"number":"52508","status":"Закрыто","title":"Автопроверка / в типе поиска \"Поиск\" задублировался блок с переменными"},{"number":"50991","status":"Закрыто","title":"Дополнить общий системный промпт автопроверки"},{"number":"49165","status":"Закрыто","title":"Автопроверка / действия с не исправленными заявками"},{"number":"45068","status":"Закрыто","title":"Модуль автопроверка / новые переменные"},{"number":"44247","status":"Закрыто","title":"Правки переменных в модуле автопроверка документов: добавить переменную цена авто трейд ин (входная) и поправить отражение плейсхолдера"},{"number":"43753","status":"Закрыто","title":"Автопроверка / вывести плейсхолдеры для отдельных параметров, извлеченных из документов"}]},{"name":"Производительность и надежность","why":"Снижает время массовой обработки и риск остановки проверок из-за очередей, повторной загрузки файлов и технических сбоев.","monetization":"Низкий. Критично для масштабирования и SLA, но воспринимается как обязательное качество уже оплачиваемого продукта и редко продаётся отдельно.","tasks":[{"number":"54737","status":"Очередь","title":"кеширование файлов между шагами."},{"number":"47753","status":"Backlog","title":"очередь автопроверок."},{"number":"44805","status":"Backlog","title":"логирование."},{"number":"44001","status":"Backlog","title":"проверка команды auto-check/run."},{"number":"55094","status":"Закрыто","title":"Автопроверка завершается системной ошибкой до запуска OCR/ИИ."},{"number":"53662","status":"Закрыто","title":"Автопроверка / Изменить лимиты по пикселям после конвертации"},{"number":"52206","status":"Закрыто","title":"Модуль автопроверка. Уменьшить лимиты после конвертации без потери качества"},{"number":"51416","status":"Закрыто","title":"Баг на dev ветках: система на дает завершить автопроверку, проверка заканчивается с системной ошибкой DnmConnector not found"},{"number":"47072","status":"Закрыто","title":"Автопроверка / интерфейс для остановки очереди"},{"number":"49360","status":"Закрыто","title":"Поднять сервис GOtenberg для конвертции документов в PDF."},{"number":"49447","status":"Закрыто","title":"Настроить Cron для автопроверок на Gac-test"},{"number":"49525","status":"Закрыто","title":"Приоритизация автопроверок в очереди"},{"number":"48007","status":"Закрыто","title":"Ошибки по автопроверке"},{"number":"47746","status":"Закрыто","title":"Разделить очередь автопроверок"},{"number":"47406","status":"Закрыто","title":"Ошибки по автопроверке"},{"number":"44804","status":"Закрыто","title":"Увеличить количество воркеров для автопроверки (Autocheck run)"},{"number":"44423","status":"Закрыто","title":"Увеличение скорости автопроверки"}]},{"name":"Отчетность и экономика","why":"Позволяет считать экономический эффект, стоимость автоматической и ручной проверки, контролировать качество и понимать, где алгоритмы требуют доработки.","monetization":"Средний. Помогает доказать ROI автопроверки и управлять качеством, повышая удержание и апсейл, но обычно является частью расширенного тарифа, а не самостоятельным продуктом.","tasks":[{"number":"49429","status":"Аналитика и проработка","title":"отчет по выгодам."},{"number":"321","status":"Аналитика и проработка","title":"отчетность по ручным проверкам в реф."},{"number":"44015","status":"Backlog","title":"свод по проверкам."},{"number":"43979","status":"Backlog","title":"вернуть фильтр периода."},{"number":"375","status":"Обсуждение и оценка DNM","title":"поля учета стоимости в задачах ручной проверки."},{"number":"","status":"Планируется","title":"Добавить статистику стоимости AI-проверок и расхода токенов."},{"number":"46956","status":"Backlog","title":"аудит корректности автоматической и ручной проверки импортером/контролером Инфотек."},{"number":"301","status":"Закрыто","title":"Вывести время начала и закрытия задачи в реф (дополнение к #258 Раздел автопроверки документов в реф базе)"},{"number":"47723","status":"Закрыто","title":"Отчет по качеству проверок в модуле Сервис"},{"number":"47715","status":"Закрыто","title":"Вывести в интерфейс DNM отчет по очереди автопроверок"},{"number":"44583","status":"Закрыто","title":"Модуль Автопроверка / Отчеты по качеству проверок"}]},{"name":"Расширение сценариев автопроверки","why":"Расширяет модуль на новые типы данных и этапы процесса, чтобы ошибки выявлялись раньше и меньше проверок выполнялось повторно вручную или через AI.","monetization":"Высокий. Каждый новый тип документов, фото или бизнес-процесс открывает новый объём проверок и возможность продавать автопроверку новым подразделениям и брендам.","tasks":[{"number":"54304","status":"Аналитика и проработка","title":"транскрибация и анализ аудиороликов с использованием текста в автопроверке."},{"number":"47033","status":"Backlog","title":"признак сотрудников ДЦ с правом подписи и повторное использование один раз проверенных доверенностей."},{"number":"51470","status":"Аналитика и проработка","title":"валидация маркетинговой заявки при оформлении."},{"number":"46835","status":"Backlog","title":"интеграция с Авто.ру для автопроверки документов."},{"number":"52954","status":"Закрыто","title":"Не проходит автопроверка части заявок"},{"number":"52584","status":"Закрыто","title":"Автопроверка документов / минимальное кол-во печатей 0."},{"number":"52401","status":"Закрыто","title":"Перевод на новый модуль ИИ."},{"number":"50488","status":"Закрыто","title":"Автопроверка / справочник причин несрабатывания автопроверки"},{"number":"51430","status":"Закрыто","title":"Создание анкеты СОПД, проверки"},{"number":"51185","status":"Закрыто","title":"Автопроверка документов. Прописать URL поставщика"},{"number":"50361","status":"Закрыто","title":"Создание и закрытие задачи на ручную проверку в DNM для нового раздела в реф."},{"number":"49827","status":"Закрыто","title":"Удалить из кода рудименты по модулю автопроверка"},{"number":"258","status":"Закрыто","title":"Раздел автопроверки документов в реф базе"},{"number":"49601","status":"Закрыто","title":"Гарантия / автопроверка / поправить паттерн поиска кодов работ"},{"number":"47969","status":"Закрыто","title":"Автопроверка в гарантии: двухэтажные артикулы запчастей"},{"number":"48008","status":"Закрыто","title":"Пустой ответ ИИ при автопроверке"},{"number":"47725","status":"Закрыто","title":"Фильтр по результату автопроверки - значение \"не запускалась\""},{"number":"46991","status":"Закрыто","title":"Автопроверка в гарантии отдает неверные комментарии"},{"number":"45711","status":"Закрыто","title":"Удалить устаревшие классы из кода"},{"number":"44252","status":"Закрыто","title":"Добавить фильтр по статусам автопроверки в скидки"},{"number":"43928","status":"Закрыто","title":"Проверка сканов СОПД. Вывод чек-листа проверки"},{"number":"43644","status":"Закрыто","title":"Копирование ЧЛ автопроверки"}]}]},{"name":"AI-ассистент мастера приёмщика","features":[{"name":"Персональный брифинг и рекомендации","why":"Помогает мастеру быстро подготовиться к визиту, увидеть историю и риски клиента, предложить релевантные работы и повысить средний чек.","monetization":"Высокий. Даёт мастеру конкретные рекомендации для допродаж и удержания клиента; эффект можно связать со средним чеком и дополнительной выручкой сервиса.","tasks":[{"number":"52185","status":"Очередь","title":"агрегировать ЗН по ДЦ/модели/пробегу и подставлять средние цены, топ работ и запчастей в промпт."},{"number":"52007","status":"Backlog","title":"карточный интерфейс брифинга с блоками «расширьте чек», «критически важно», «обратить внимание»."},{"number":"54875","status":"Очередь","title":"плейсхолдеры статуса программы лояльности, активных баллов и срока действия."},{"number":"53712","status":"На проверке постановщиком","title":"блок документов по автомобилю в истории ремонтов по VIN с автоматической фильтрацией по тегам."},{"number":"50812","status":"Закрыто","title":"Разделение промптов по ролям. Ассистент сервиса."},{"number":"44003","status":"Закрыто","title":"ИИ - ассистент мастера приемщика."}]},{"name":"Контроль эффекта","why":"Показывает, пользуются ли дилеры рекомендациями ассистента и какой реальный денежный эффект они дают.","monetization":"Средний. Сам по себе отчёт не создаёт выручку, но подтверждает финансовый эффект ассистента и помогает продлевать, масштабировать и повышать тариф.","tasks":[{"number":"54363","status":"Code review","title":"отчет: ЗН, факт подготовки, выполненные рекомендации и сумма расширения чека."}]},{"name":"Монетизация и управление доступом","why":"Позволяет масштабировать платное использование ассистента и автоматически контролировать лимиты и доступ по дилерам и ролям.","monetization":"Высокий. Непосредственно создаёт техническую основу для платных лимитов, тарифов, ролей и масштабирования ассистента по дилерской сети.","tasks":[{"number":"46699","status":"Backlog","title":"токены дилеров, лимиты по запросам/сроку и автоматическая блокировка доступа."},{"number":"54534","status":"Реализовано","title":"настройка показа баннера AI-ассистента по ролям."}]},{"name":"Сервис → продажи","why":"Использует сервисный визит как сигнал для новой продажи и помогает передавать в ОП клиентов, готовых к замене автомобиля.","monetization":"Высокий. Формирует дополнительные лиды на продажу автомобиля из сервисной базы; эффект напрямую измеряется конверсией и дополнительными продажами.","tasks":[{"number":"","status":"Планируется","title":"Использовать запись на сервис для предложения тест-драйва/замены автомобиля и передачи релевантного сигнала в продажи."}]}]},{"name":"Модуль обучения","features":[{"name":"ИИ-тренер","why":"Экономит время и стоимость живых тренеров, позволяет сотрудникам отрабатывать практические навыки в диалоге и автоматически оценивать их по единым стандартам, а импортеру — видеть типовые слабые места дилерской сети.","monetization":"Высокий. Заменяет часть работы живых тренеров, масштабирует практическую отработку навыков и автоматическую оценку; понятная экономия на обучении и отдельная AI-ценность.","tasks":[{"number":"54679","status":"Обсуждение и оценка DNM","title":"диалог с ИИ-тренером."},{"number":"51795","status":"Backlog","title":"открытый ответ с AI-оценкой по матрице."},{"number":"54703","status":"Backlog","title":"дизайн экранов AI-чата/оценки в плане обучения."}]},{"name":"Редизайн интерфейсов","why":"Упрощает администрирование и работу сотрудников в модуле: меньше переходов между экранами, понятнее структура тестов, курсов, календаря и карточки сотрудника.","monetization":"Низкий. Повышает удобство и вовлечённость, но является улучшением базового продукта и практически не продаётся как самостоятельная функция.","tasks":[{"number":"55150","status":"Аналитика и проработка","title":"новый интерфейс структуры теста и статистика."},{"number":"52110","status":"Дизайн","title":"дизайн интерфейса тестов."},{"number":"54870","status":"Code review","title":"фильтры и столбцы списка курсов."},{"number":"54435","status":"Верстка","title":"вкладка обучения в карточке пользователя."},{"number":"49853","status":"Backlog","title":"верстка календаря."},{"number":"48891","status":"Backlog","title":"исправить дубли фильтров по датам."},{"number":"51099","status":"Закрыто","title":"Редизайн планов обучения"},{"number":"51105","status":"Закрыто","title":"Обучение / редизайн карточки курса администратора"},{"number":"50039","status":"Закрыто","title":"Изменение элементов интерфейса прохождения теста с учетом редизайна"},{"number":"50035","status":"Закрыто","title":"Изменение элементов интерфейса прохождения курса с учетом редизайна"},{"number":"50053","status":"Закрыто","title":"Редизайн интерфейса редактирования курса администратора в модуле обучения и модального окна редактирования его настроек"},{"number":"50038","status":"Закрыто","title":"Обучение / Отражение описания вопроса в интерфейсе"},{"number":"50263","status":"Закрыто","title":"Обучение / Поправить верстку поля \"Дата начала\" мероприятия"},{"number":"45570","status":"Закрыто","title":"Модуль Обучение: редизайн интерфейса прохождения тестов и курсов у пользователя"},{"number":"45362","status":"Закрыто","title":"Модуль Обучение: дизайн раздела материалы"},{"number":"46268","status":"Закрыто","title":"Модуль Обучение / дизайн модального окна добавления материала / Папки"}]},{"name":"Расширение форматов курса","why":"Дает больше вариантов учебного контента и делает прохождение курса единообразным: материалы корректно открываются во всех сценариях, вебинары и записи становятся частью единого курса.","monetization":"Средний. Делает платформу применимой для большего числа программ и контента и повышает конкурентоспособность модуля, но обычно входит в стоимость LMS.","tasks":[{"number":"55069","status":"В работе","title":"использовать новый просмотрщик материалов во всех сценариях."},{"number":"51221","status":"Backlog","title":"задержка между слайдами."},{"number":"50371","status":"Backlog","title":"не разрешать добавлять в курс нечитаемые материалы."},{"number":"54675","status":"Backlog","title":"слайдер вместо боковой панели."},{"number":"53470","status":"Code review","title":"транскрибация/конспект LiveDigital."},{"number":"52668","status":"Аналитика и проработка","title":"чат вебинара."},{"number":"49663","status":"На проверке постановщиком","title":"видеозапись вебинара как материал."},{"number":"51238","status":"Закрыто","title":"Модуль Обучение / добавление слайдов из презентации"},{"number":"52411","status":"Закрыто","title":"Конвертация материалов в gotenberg для открытия в новом просмотрщике"},{"number":"52768","status":"Закрыто","title":"В течение 2 часов не происходит конвертация в новом просмотрщике"},{"number":"50679","status":"Закрыто","title":"Просмотрщик материалов в модуле Обучение"},{"number":"51239","status":"Закрыто","title":"Добавление нового материала сразу из раздела \"Курсы\""},{"number":"50037","status":"Закрыто","title":"Доп. варианты страницы прохождения тестов: после отправки ответов, по блокам, по вопросам."},{"number":"50331","status":"Закрыто","title":"Обучение / Материалы и База знаний — автоматически использовать изображение как обложку материала"},{"number":"49677","status":"Закрыто","title":"Модуль обучение: типы теста"},{"number":"50324","status":"Закрыто","title":"Обучение / Материалы / материал при изменении родителя не открывается / нет возможности его удалить"},{"number":"49916","status":"Закрыто","title":"Не работает просмотрщик материалов в /material/index"},{"number":"48892","status":"Закрыто","title":"Конфигуратор быстрых фильтров в модуле Обучение"},{"number":"48157","status":"Закрыто","title":"Модуль Обучение / добавление материалов в курс"},{"number":"47981","status":"Закрыто","title":"Баги модуля Обучение"},{"number":"45433","status":"Закрыто","title":"Модуль Обучение: разработка раздела Материалы"},{"number":"45569","status":"Закрыто","title":"Обучение / тесты"},{"number":"47157","status":"Закрыто","title":"Не грузится файл в превью в модуле Обучение"},{"number":"239","status":"Закрыто","title":"Проблема с доступом к разделу"},{"number":"45012","status":"Закрыто","title":"Модуль Обучение дублирование тренингов на одной УЗ."}]},{"name":"Планы обучения и назначения","why":"Убирает лишние и дублирующие назначения, корректно учитывает фактические должности сотрудника и позволяет дилеру видеть обязательную программу обучения своих сотрудников.","monetization":"Средний. Это важная enterprise-функция для автоматизации обучения сети и удержания клиента, но скорее усиливает основной тариф, чем формирует отдельный платный продукт.","tasks":[{"number":"55245","status":"Аналитика и проработка","title":"единый учет фактических должностей."},{"number":"54878","status":"Backlog","title":"перезачет курса между планами."},{"number":"53461","status":"Backlog","title":"назначение текущим сотрудникам и повторное назначение."},{"number":"379","status":"Backlog","title":"массовое назначение."},{"number":"53968","status":"Аналитика и проработка","title":"режим просмотра планов обучения для ДЦ."},{"number":"44268","status":"Аналитика и проработка","title":"реструктуризация сущностей плана обучения."},{"number":"45313","status":"Backlog","title":"дальнейшая реструктуризация сущностей и архива."},{"number":"53555","status":"Закрыто","title":"Реструктуризация планов обучения: часть 1"},{"number":"50073","status":"Закрыто","title":"Загрузка исторических данных по курсам"},{"number":"44987","status":"Закрыто","title":"Не срабатывает настройка уведомления о добавлении курса в инд. план в диспетчере событий"}]},{"name":"Каталог и управление мероприятиями","why":"Дает сотруднику единое место для выбора и записи на обучение, а импортеру — управляемый процесс регистрации, уведомлений, календаря и статусов очных мероприятий и вебинаров.","monetization":"Средний. Закрывает полноценный процесс очного и онлайн-обучения и повышает ценность LMS, однако чаще продаётся внутри модуля как обязательный функциональный блок.","tasks":[{"number":"55129","status":"Дизайн","title":"каталог обучения."},{"number":"54264","status":"Дизайн","title":"карточка курса/мероприятия в модалке с записью из календаря."},{"number":"50522","status":"Backlog","title":"вкладка «Все» для сотрудников с несколькими должностями."},{"number":"53975","status":"Очередь","title":"уведомления за дни/часы/минуты и по типу курса."},{"number":"45970","status":"Backlog","title":"дата и время окончания регистрации."},{"number":"45082","status":"Backlog","title":"метастатусы/вкладки по отделам."},{"number":"44539","status":"Backlog","title":"модалка мероприятия."},{"number":"46256","status":"Backlog","title":"сущность «Событие»."},{"number":"54354","status":"Закрыто","title":"Модуль Обучение / отображение статуса курса при добавлении участников"},{"number":"53397","status":"Закрыто","title":"Доработать модальное окно регистрации участников в модуле «Обучение»"},{"number":"54458","status":"Закрыто","title":"Модуль Обучение / не учитывать запись вебинара при расчете прохождения курса"},{"number":"53106","status":"Закрыто","title":"Модуль Обучение / невозможность зайти в вебинар"},{"number":"51557","status":"Закрыто","title":"Обучение / не происходит авторизация на вебинар"},{"number":"49394","status":"Закрыто","title":"Кнопка входа в вебинар"},{"number":"50247","status":"Закрыто","title":"Обучение / QR-код на заполнение анкеты ОС и прохождение теста"},{"number":"48393","status":"Закрыто","title":"Кнопка запуска вебинара"},{"number":"48757","status":"Закрыто","title":"Модуль Обучение. Значок открытия вебинара"},{"number":"47397","status":"Закрыто","title":"Не появляется ссылка на вебинар в модуле Обучение Чанган"},{"number":"45653","status":"Закрыто","title":"Мероприятия / пагинация в модальном окне"},{"number":"44482","status":"Закрыто","title":"Доработки раздела Мероприятия: подтверждение участников и запись на мероприятия"},{"number":"44865","status":"Закрыто","title":"Доработки раздела вебинаров"},{"number":"44504","status":"Закрыто","title":"Добавление статуса мероприятия"},{"number":"44235","status":"Закрыто","title":"Модуль Обучения / правки раздела \"Мероприятия\""}]},{"name":"Отчетность","why":"Связывает обучение с продажами и KPI, позволяет видеть результат обучения по сети, ДЦ и сотрудникам и ускоряет управленческий анализ за счет выгрузок и ИИ.","monetization":"Высокий. Связка обучения с продажами, KPI и AI-анализом показывает бизнес-эффект обучения, создаёт управленческую ценность и может быть основанием для premium-тарифа.","tasks":[{"number":"54766","status":"Реализовано","title":"настраиваемая выгрузка отчета «Обучение и продажи»."},{"number":"54632","status":"Backlog","title":"XLSX-выгрузка всего отчета «Обучение и продажи»."},{"number":"54586","status":"Backlog","title":"AI-анализ отчета «Обучение и продажи»."},{"number":"55248","status":"Реализовано","title":"корректные фильтры региональных менеджеров."},{"number":"51162","status":"Backlog","title":"выгрузка по тренингам из отчета по персоналу."},{"number":"","status":"Планируется","title":"Связать результаты обучения с KPI и AI-данными по фактической работе сотрудника."},{"number":"54598","status":"Закрыто","title":"Новые фильтры в отчете по обучению и продажам"},{"number":"54620","status":"Закрыто","title":"Модуль Обучение / исправить расчет выполнения плана продаж в отчете «Обучение и продажи»"},{"number":"54500","status":"Закрыто","title":"Обучение / поправить отчет: /training/report/sales"},{"number":"51240","status":"Закрыто","title":"Обучение: реализовать отчет по обучению и продажам"},{"number":"52212","status":"Закрыто","title":"Обучение, отчет по персоналу: выводить участников, которым не назначено мероприятие"},{"number":"43985","status":"Закрыто","title":"Скрыть для ДЦ в выгрузке  /training/offline  участников тренинга из других ДЦ"}]},{"name":"Сертификация и компетенции","why":"Дает целостную картину развития сотрудника: не только факт прохождения курса, но и сертификат, компетенции и историю развития.","monetization":"Средний. Важна для крупных сетей и формальных программ сертификации; повышает ценность LMS и может входить в расширенный тариф, но потребность есть не у всех клиентов.","tasks":[{"number":"51678","status":"Backlog","title":"фирменный сертификат Changan."},{"number":"","status":"Планируется","title":"Создать сущность «Компетенции» и 360°-профиль сотрудника."},{"number":"50523","status":"Закрыто","title":"Обучение / сертификационный путь: добавить признак сертификации по блоку"},{"number":"49614","status":"Закрыто","title":"На Эволют у ответственного за обучения импортера нет возможности редактировать сертификационный путь"}]},{"name":"Коммерческий контур","why":"Расширяет доступный контент и позволяет монетизировать обучение через готовые курсы, каталог и упрощенный путь от выбора программы до подключения.","monetization":"Высокий. Напрямую создаёт канал продажи готовых курсов и дополнительных образовательных продуктов внутри DNM.","tasks":[{"number":"","status":"Планируется","title":"Развивать маркетплейс курсов."},{"number":"","status":"Планируется","title":"Добавить платные курсы Инфотек/VOLGA."},{"number":"","status":"Планируется","title":"Автоматизировать онбординг после подключения обучения."}]}]},{"name":"База знаний + ИИ","features":[{"name":"Качество и доказуемость ответов","why":"Повышает доверие к ИИ и точность ответов на большой разнородной базе знаний, позволяя пользователю сразу проверить исходный документ.","monetization":"Высокий. Доверие к ответам и возможность перейти к источнику являются базой для продажи AI-поиска по корпоративной БЗ как самостоятельного платного продукта.","tasks":[{"number":"51796","status":"На проверке постановщиком","title":"цитаты внутри ответа, изображения страниц и кликабельные ссылки на источники."},{"number":"","status":"Планируется","title":"Внедрить графы и донастроить конфигурацию RAG на реальных документах."},{"number":"","status":"Планируется","title":"Продолжить проверку качества ответов на реальных вопросах."},{"number":"51800","status":"Закрыто","title":"RAG [DNM]. Изменить лоадер при ожидании ответа модели."},{"number":"51798","status":"Закрыто","title":"RAG [DNM]. Добавить передачу в промежуточный сервис ссылки на документ в БЗ."},{"number":"52303","status":"Закрыто","title":"RAG [DNM]. На тестовых и dev ветках не уходят запросы к промежуточному сервису."},{"number":"50157","status":"Закрыто","title":"Изменить в конфиге dev'а адрес промежуточного KB сервиса"},{"number":"49121","status":"Закрыто","title":"Предоставить доступы сотрудникам к Smart KB"},{"number":"48552","status":"Закрыто","title":"Включить модуль \"База Знаний\" в DNM https://smart-kb.autocrm.ru."},{"number":"48587","status":"Закрыто","title":"Настроить возможность сборки dev-стендов для DNM smart-kb.autocrm.ru"},{"number":"48490","status":"Закрыто","title":"Подключить модели Google в Open Router."},{"number":"45931","status":"Закрыто","title":"Развернуть DNM для Умной Базы Знаний."},{"number":"46118","status":"Закрыто","title":"Foton. Ошибка при открытии файлов в БЗ."}]},{"name":"Автоматизация наполнения БЗ","why":"Снижает ручную работу по подготовке документов и риск ошибок в тегах и связях между материалами.","monetization":"Средний. Снижает стоимость администрирования большой базы знаний и ускоряет внедрение, но ценность обычно монетизируется в составе AI-БЗ.","tasks":[{"number":"","status":"Планируется","title":"Уйти от ручного тегирования документов за счет агентного поведения и NER."},{"number":"51799","status":"Закрыто","title":"Выделить функционал тегирования документов в Базе знаний DNM от функционала Умной БЗ."},{"number":"48803","status":"Закрыто","title":"Добавить возможность удаления тегов / категорий Базы Знаний, фильтрацию по атрибутам тега"},{"number":"48870","status":"Закрыто","title":"Выполнить редизайн тегов Базы Знаний"},{"number":"48829","status":"Закрыто","title":"Улучшение UX ответов модели и визуализации тегов в чате Умной Базы Знаний"},{"number":"48830","status":"Закрыто","title":"Расширение логики фильтрации документов по тегам через условия AND/OR в чате Умной Базы Знаний"},{"number":"48802","status":"Закрыто","title":"Добавить фильтрацию по тегам в Базе Знаний"}]},{"name":"UX и производительность","why":"Делает БЗ пригодной для ежедневной работы: сокращает ожидание индексации и ответа и упрощает интерфейс.","monetization":"Низкий. Ускоряет индексацию и ответы и улучшает UX, но это базовое качество AI-БЗ и слабая самостоятельная причина для отдельной оплаты.","tasks":[{"number":"","status":"Планируется","title":"Финализировать UI."},{"number":"","status":"Планируется","title":"Маршрутизировать простые вопросы в быструю/дешевую модель, сложные — в более мощную."},{"number":"","status":"Планируется","title":"Оптимизировать индексацию."},{"number":"51797","status":"Закрыто","title":"RAG [DNM]. Подготовить дизайн модального окна с миниатюрой изображения в чате Умной БЗ."},{"number":"48828","status":"Закрыто","title":"Изменить хранение и отображения истории сессий в чате Умной Базы Знаний"}]}]},{"name":"Модуль рассылок для дилеров","features":[{"name":"Платформа и конструктор рассылок","why":"Создает единый тиражируемый сервис рассылок для разных CRM и дает дилеру самостоятельный понятный инструмент подготовки и отправки писем.","monetization":"Высокий. Самостоятельный тиражируемый продукт с понятной моделью оплаты за ДЦ, пользователей или объём отправок.","tasks":[{"number":"20889","status":"Очередь","title":"сервис, домены и ящики."},{"number":"20888","status":"Реализовано","title":"черновики, шаблоны и отправка писем."},{"number":"21230","status":"Доработки","title":"внедрение сервиса/API в CRM Автодилер."},{"number":"21231","status":"Очередь","title":"NPM-интерфейс управления ящиками."},{"number":"21273","status":"Очередь","title":"5-шаговый конструктор рассылок."},{"number":"48887","status":"Закрыто","title":"Архитектура и MVP модуля дилерских рассылок (Автодилер + DNM)"}]},{"name":"Качество клиентской базы","why":"Снижает повторные коммуникации и жалобы за счет очистки дублей и формирования единого профиля клиента.","monetization":"Средний. Улучшает доставляемость и снижает жалобы и лишние коммуникации, но чаще является частью платформы рассылок и CRM, а не отдельным продуктом.","tasks":[{"number":"48889","status":"Доработки","title":"единый профиль и дедупликация клиента на уровне дилера/холдинга."}]},{"name":"Триггерные коммуникации","why":"Позволяет дилеру автоматически запускать коммуникации по событиям без ручной подготовки каждой кампании.","monetization":"Высокий. Автоматические коммуникации напрямую влияют на повторные продажи и сервисные визиты и хорошо подходят для тарификации как расширенный функционал.","tasks":[{"number":"","status":"Планируется","title":"Добавить настраиваемые триггеры для дилеров с использованием очищенной базы и согласованных шаблонов."}]}]},{"name":"Мобильное приложение DNM/CRM","features":[{"name":"Мобильное рабочее место","why":"Позволяет менеджерам и мастерам работать с основными процессами с телефона и фиксировать данные непосредственно в момент работы с клиентом.","monetization":"Высокий. Расширяет число активных пользователей и сценарии ежедневной работы; возможно лицензирование по пользователям/ДЦ как отдельного мобильного канала.","tasks":[{"number":"","status":"Планируется","title":"Разработать MVP PWA с основными сценариями продаж, сервиса, склада и чек-листов."},{"number":"","status":"Планируется","title":"Отдельно проработать мобильные сценарии модуля Обучение."}]},{"name":"Телефония, push и нативные функции","why":"Сохраняет контекст звонка в DNM/CRM и дает полноценные мобильные уведомления и обработку звонков, в том числе при заблокированном экране.","monetization":"Высокий. Телефония и нативные уведомления создают самостоятельную операционную ценность и могут входить в более дорогой мобильный тариф.","tasks":[{"number":"","status":"Планируется","title":"Интегрировать SDK Voximplant, открывать при звонке релевантный РЛ/ЗН/историю клиента и сохранять звонок в системе."},{"number":"","status":"Планируется","title":"Обернуть PWA через Capacitor в .apk/.ipa."},{"number":"","status":"Планируется","title":"Подготовить инфраструктуру подписи iOS, D-U-N-S и аккаунты магазинов."}]},{"name":"Публикация приложения","why":"Упрощает массовое внедрение мобильного приложения у дилеров и обеспечивает официальный канал установки и обновлений.","monetization":"Низкий. Не создаёт отдельной клиентской ценности, а является необходимым условием удобного распространения и обновления приложения.","tasks":[{"number":"","status":"Планируется","title":"Подготовить витрину, политику конфиденциальности, демо-стенд и публикацию в сторах."}]}]},{"name":"Умный центр диалогов","features":[{"name":"Единый AI-контур коммуникаций","why":"Объединяет звонки, чаты и почту в единую историю клиента, автоматически оценивает качество общения и дает менеджеру контекст и рекомендации для следующего контакта.","monetization":"Высокий. Объединяет несколько каналов и AI-анализ в отдельный продуктовый контур, который можно тарифицировать по пользователям, каналам или объёму диалогов.","tasks":[{"number":"50614","status":"Backlog","title":"транскрибация/суммаризация, ЧЛ качества, пропущенные звонки и AI-аналитика в CRM."},{"number":"","status":"Планируется","title":"Объединить анализ чатов, аудиозвонков и почты в общий контур."},{"number":"","status":"Планируется","title":"Сводить историю диалогов к клиенту/РЛ."},{"number":"","status":"Планируется","title":"Формировать подсказки для следующего контакта на основе предыдущих коммуникаций."}]}]},{"name":"Контакт-центр (CRM)","features":[{"name":"Каналы и маршрутизация обращений","why":"Собирает обращения из разных каналов в едином процессе, сохраняет историю и позволяет корректно маршрутизировать лид между дилерами, целями обращения и дистрибьюциями.","monetization":"Высокий. Это ядро контакт-центра и отдельный бизнес-процесс, за который клиент готов платить как за полноценный CRM/CC-продукт.","tasks":[{"number":"","status":"Планируется","title":"Объединить чаты, звонки и заявки в одном окне; автоматически создавать лиды/РЛ; добавить универсальный webhook для внешних форм."},{"number":"53231","status":"Очередь","title":"MAX в LMS, в т.ч. возврат недозвоненных лидов через сообщения."},{"number":"","status":"Планируется","title":"Добавить новые каналы: Дром, ВК, Ozon, WA/TG для Казахстана."},{"number":"51044","status":"Ждем согласования/оплаты/ДС","title":"смена дилера через связанные лиды."},{"number":"51040","status":"Ждем согласования/оплаты/ДС","title":"смена цели обращения."},{"number":"","status":"Планируется","title":"Доработать события закрытия LMS-лидов."},{"number":"54573","status":"Ждем согласования/оплаты/ДС","title":"выбор активного ящика по дистрибьюции при отправке письма из лида."},{"number":"20734","status":"Закрыто","title":"Приложение VOX для реализации QR звонков в CRM"},{"number":"21085","status":"Закрыто","title":"Транскрибация звонков в CRM"},{"number":"49099","status":"Закрыто","title":"Добавить поддержку расширения .txt во вложениях в лидах"},{"number":"20283","status":"Закрыто","title":"Всплывающие окошки при звонке"}]},{"name":"UX и производительность","why":"Ускоряет работу оператора и снижает риск потери обращения из-за задержек и перегруженного интерфейса.","monetization":"Низкий. Ускоряет работу операторов, но воспринимается как обязательное качество контакт-центра, а не самостоятельная платная возможность.","tasks":[{"number":"","status":"Планируется","title":"Оптимизировать создание лидов по звонкам и чатам."},{"number":"","status":"Планируется","title":"Обновить UX меню, карточки лида и создания РЛ."},{"number":"","status":"Планируется","title":"Добавить режимы «Мои»/«Наблюдаю»."},{"number":"48543","status":"Закрыто","title":"Коллцентр, долгая загрузка"},{"number":"20057","status":"Закрыто","title":"504  /yii/contactCenter/report/attract/"}]},{"name":"Аналитика","why":"Дает руководителю полную картину нагрузки и эффективности операторов, каналов и конверсии до РЛ.","monetization":"Средний. Повышает управляемость контакт-центра и даёт основу для premium-отчётности, но основная ценность зависит от уже используемого операционного контура.","tasks":[{"number":"","status":"Планируется","title":"Расширить и оптимизировать отчетность по лидам, операторам, времени обработки и источникам."}]},{"name":"Процессы клиентской службы","why":"Переносит сложные процессы клиентской службы из Excel в DNM и снижает ручной перенос и рассинхронизацию данных.","monetization":"Средний. Заменяет Excel и ручные процессы, повышая ценность CRM и удержание клиента; чаще монетизируется как расширение существующего модуля.","tasks":[{"number":"44039","status":"Ждем согласования/оплаты/ДС","title":"процесс согласования компенсации/возврата автомобиля с настраиваемыми расчетами в DNM."}]}]},{"name":"Предодобрение кредита Сбербанк в DNM","features":[{"name":"Кредитный скоринг и триггерные предложения","why":"Позволяет использовать кредитный потенциал клиента уже в первом контакте и повторно активировать клиентов сервиса релевантным предложением нового автомобиля.","monetization":"Высокий. Может давать прямой прирост продаж и кредитных сделок, а также допускает партнёрскую модель оплаты за лид, заявку или результат.","tasks":[{"number":"","status":"Планируется","title":"При создании лида передавать в Сбербанк телефон, бренд и модель; возвращать и показывать менеджеру предодобренный кредитный лимит."},{"number":"","status":"Планируется","title":"По ЗН и заданным условиям автоматически формировать коммуникацию клиенту с релевантным кредитным предложением."}]}]},{"name":"Модуль In-App продаж","features":[{"name":"Витрина и продажа продуктов","why":"Повышает знание клиентов о доступных модулях и сокращает путь от интереса к подключению и использованию продукта.","monetization":"Высокий. Это прямой канал внутренних продаж модулей и услуг DNM, который сокращает путь до покупки и непосредственно влияет на выручку.","tasks":[{"number":"376","status":"Code review","title":"единый механизм рекламных/информационных карточек и модалок с заявкой на подключение."},{"number":"","status":"Планируется","title":"Создать внутри DNM/CRM страницу-витрину приложений и дополнительных сервисов."},{"number":"","status":"Планируется","title":"Автоматизировать путь запрос → подтверждение ЛПР → подключение/продажа → онбординг."}]},{"name":"Аналитика воронки","why":"Позволяет оценивать эффективность внутренних продаж продуктов от показа карточки до фактического подключения.","monetization":"Средний. Помогает повышать конверсию внутренних продаж и оптимизировать продуктовые предложения, но сама по себе не является отдельным продаваемым продуктом.","tasks":[{"number":"","status":"Планируется","title":"Сделать отчет по просмотрам карточек, лидам и конверсии в подключение/продажу."}]}]},{"name":"Лид-расчет-рекомендации в ОП по клиенту записанному на сервис","features":[{"name":"Сервис → продажи","why":"Позволяет системно выявлять клиентов сервиса, готовых к замене автомобиля, и сразу передавать в продажи персональное предложение из реального склада.","monetization":"Высокий. Создаёт новый поток лидов из сервисной базы и персональные предложения по реальному складу; ценность напрямую измеряется дополнительными продажами.","tasks":[{"number":"","status":"Планируется","title":"Анализировать будущую запись/ПЗН/ЗН по набору параметров и рассчитывать вероятность обмена автомобиля."},{"number":"","status":"Планируется","title":"Автоматически формировать индивидуальное КП с вариантами обмена на базе актуального склада и передавать его в отдел продаж/CRM."}]}]},{"name":"Анализ оттока клиентов из сервиса","features":[{"name":"Причины оттока и удержание","why":"Помогает понять, почему клиент уходит в другой ДЦ, и дает исходному дилеру фактические причины для улучшения процесса удержания.","monetization":"Высокий. Удержание сервисных клиентов напрямую связано с повторной выручкой; аналитика причин оттока имеет понятный финансовый эффект и может продаваться как AI-аналитика.","tasks":[{"number":"","status":"Планируется","title":"При получении ЗН по заезду не в свой ДЦ автоматически отправлять клиенту опрос, а исходному ДЦ передавать обезличенную аналитику по причинам ухода."}]}]}]</script>
 <script>
 (function(){
   const STORAGE_KEY="infotech-dnm-product-map-v3";
   const initial=JSON.parse(document.getElementById("initialData").textContent);
+  const productDescriptions=JSON.parse(document.getElementById("productDescriptions").textContent);
 
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const clone=v=>JSON.parse(JSON.stringify(v));
   const closed=t=>String(t.status||"").toLowerCase()==="закрыто";
 
-  let state=load();
+  function prioritizeModules(data){
+    const priority=["Модуль обучения","Автопроверка"];
+    const rank=name=>{
+      const i=priority.indexOf(name);
+      return i===-1 ? priority.length : i;
+    };
+    return data
+      .map((item,index)=>({item,index}))
+      .sort((a,b)=>{
+        const ra=rank(a.item.name), rb=rank(b.item.name);
+        return ra===rb ? a.index-b.index : ra-rb;
+      })
+      .map(x=>x.item);
+  }
+
+  function hydrateDescriptions(data){
+    data.forEach(m=>{
+      if(!m.description){
+        m.description=clone(productDescriptions[m.name]||{
+          users:"В продуктовом плане не заполнено.",
+          beneficiaries:"В продуктовом плане не заполнено.",
+          area:"В продуктовом плане не заполнено.",
+          functional:"В продуктовом плане не заполнено.",
+          benefits:"В продуктовом плане не заполнено.",
+          competitors:"В продуктовом плане не заполнено.",
+          usp:"В продуктовом плане не заполнено."
+        });
+      }
+    });
+    return data;
+  }
+
+  let state=prioritizeModules(hydrateDescriptions(load()));
   let active=0;
   let editMode=false;
+  let viewMode="roadmap";
   const collapsed=new Set();
+
+  function areAllFeaturesCollapsed(){
+    const features=state[active]?.features||[];
+    return features.length>0 && features.every((_,i)=>collapsed.has(`${active}:${i}`));
+  }
+
+  function toggleAllFeatures(){
+    const features=state[active]?.features||[];
+    if(areAllFeaturesCollapsed()){
+      features.forEach((_,i)=>collapsed.delete(`${active}:${i}`));
+    }else{
+      features.forEach((_,i)=>collapsed.add(`${active}:${i}`));
+    }
+    render();
+  }
 
   function load(){try{const x=localStorage.getItem(STORAGE_KEY);return x?JSON.parse(x):clone(initial)}catch(e){return clone(initial)}}
   function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$("saveState").textContent="Сохранено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})}catch(e){$("saveState").textContent="Не удалось сохранить"}}
@@ -335,15 +976,34 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     return{level,reason:m[2]||""};
   }
   function labelClass(status){
-    const s=String(status||"").toLowerCase();
-    if(s==="закрыто")return"label-default";
-    if(s.includes("работ"))return"label-primary";
-    if(s.includes("реализ")||s.includes("code review")||s.includes("проверке"))return"label-info";
-    if(s.includes("ожид")||s.includes("соглас"))return"label-warning";
-    if(s.includes("дизайн")||s.includes("аналит"))return"label-success";
-    return"label-primary";
+    const s=String(status||"").trim().toLowerCase();
+
+    if(s==="backlog" || s==="планируется" || s==="планирование") return "label-default";
+
+    if(
+      s==="очередь" ||
+      s==="в работе" ||
+      s==="тестирование" ||
+      s==="вылить" ||
+      s==="на проверке постановщиком" ||
+      s==="code review" ||
+      s==="верстка"
+    ) return "label-primary";
+
+    if(s==="обсуждение и оценка dnm" || s==="обсуждение и оценка") return "label-yellow";
+
+    // В запросе для "Закрыто" указаны два варианта. Используем последнее правило: label-success.
+    if(s==="закрыто") return "label-success";
+
+    // Для уже реализованного, но ещё не закрытого состояния используем нейтральный серый чип.
+    if(s==="реализовано") return "label-grey2";
+
+    if(s.includes("ждем согласования") || s.includes("ожид")) return "label-warning";
+    if(s.includes("аналит") || s.includes("дизайн")) return "label-info";
+
+    return "label-default";
   }
-  function moneyLabel(level){return level==="Высокий"?"label-success":level==="Низкий"?"label-default":"label-warning"}
+  function moneyLabel(level){return level==="Высокий"?"label-dark-green":level==="Средний"?"label-info":"label-default"}
   function taskText(t){
     return `${t.number?"#"+t.number+" ":""}${t.status&&t.status!=="Планируется"?"("+t.status+") — ":""}${t.title||""}`.trim()
   }
@@ -355,7 +1015,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     const ul=$("moduleNav");ul.innerHTML="";
     state.forEach((m,i)=>{
       const li=document.createElement("li");if(i===active)li.className="active";
-      const a=document.createElement("a");a.href="#";a.innerHTML=`${esc(m.name)} <span class="badge">${m.features.length}</span>`;
+      const a=document.createElement("a");a.href="#";a.textContent=m.name;
       a.onclick=e=>{e.preventDefault();active=i;render()};
       li.appendChild(a);ul.appendChild(li);
     })
@@ -368,16 +1028,63 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     const m=state[active];
     const all=m.features.flatMap(f=>f.tasks);
     const done=all.filter(closed).length;
-    $("moduleTitle").textContent=m.name;
-    $("rootTitle").textContent=m.name;
-    $("moduleMeta").textContent=`${m.features.length} функциональных блоков · ${all.length} доработок`;
+    const planned=all.filter(t=>["планируется","backlog"].includes(String(t.status||"").toLowerCase())).length;
+    const closedCount=all.filter(t=>String(t.status||"").toLowerCase()==="закрыто").length;
+    const inwork=Math.max(0,all.length-planned-closedCount);
+    const total=Math.max(1,all.length);
+    const segWidth=v=>(v/total*100);
+    const segCenter=(offset,width)=>offset + width/2;
+    const plannedW=segWidth(planned), inworkW=segWidth(inwork), closedW=segWidth(closedCount);
     $("summaryStrip").innerHTML=`
-      <span><strong>${m.features.length}</strong> Ф-л</span><span class="sep"></span>
-      <span><strong>${all.length-done}</strong> планируются / в работе</span><span class="sep"></span>
-      <span><strong>${done}</strong> закрыто</span>
-      <span class="progress" title="Доля закрытых задач"><span class="progress-bar progress-bar-success" style="width:${all.length?Math.round(done/all.length*100):0}%"></span></span>
-      <span class="legend"><span><i class="planned"></i>активные</span><span><i class="done"></i>закрытые</span></span>`;
+      <div class="summary-progress-wrap">
+        <div class="summary-progress-labels">
+          ${closedCount?`<span class="summary-progress-label closed" style="left:${segCenter(0,closedW)}%">Закрыто: ${closedCount}</span>`:""}
+          ${inwork?`<span class="summary-progress-label inwork" style="left:${segCenter(closedW,inworkW)}%">В работе: ${inwork}</span>`:""}
+          ${planned?`<span class="summary-progress-label planned" style="left:${segCenter(closedW+inworkW,plannedW)}%">В планах: ${planned}</span>`:""}
+        </div>
+        <div class="summary-progress" title="Зелёный — закрыто, синий — в работе, серый — в планах">
+          <div class="summary-progress-segment closed" style="width:${closedW}%"></div>
+          <div class="summary-progress-segment inwork" style="width:${inworkW}%"></div>
+          <div class="summary-progress-segment planned" style="width:${plannedW}%"></div>
+        </div>
+      </div>`;
+    if($("toggleAllBtn")){
+      $("toggleAllBtn").textContent=areAllFeaturesCollapsed()?"Развернуть все":"Свернуть все";
+    }
     renderFeatures(m);
+    renderDescription(m);
+    applyViewMode();
+  }
+
+  function renderDescription(m){
+    const d=m.description||{};
+    const sections=[
+      ["Пользователи","users"],
+      ["Выгодоприобретатели","beneficiaries"],
+      ["Область применения","area"],
+      ["Функциональное описание","functional"],
+      ["Выгоды применения","benefits"],
+      ["Конкуренты","competitors"],
+      ["УТП","usp"]
+    ];
+    $("descriptionGrid").innerHTML=sections.map(([title,key])=>`
+      <section class="desc-section alert alert-info">
+        <div class="desc-alert-title">${esc(title)}</div>
+        <div class="desc-alert-text">${esc(d[key]||"В продуктовом плане не заполнено.")}</div>
+      </section>`).join("");
+  }
+
+  function applyViewMode(){
+    const roadmap=viewMode==="roadmap";
+    $("roadmapView").classList.toggle("view-hidden",!roadmap);
+    $("descriptionView").classList.toggle("view-hidden",roadmap);
+    document.querySelectorAll("#moduleViewTabs li").forEach(li=>{
+      const a=li.querySelector("a");
+      li.classList.toggle("active",a&&a.dataset.view===viewMode);
+    });
+    if($("toggleAllBtn")) $("toggleAllBtn").style.display=roadmap?"inline-block":"none";
+    if(roadmap) requestAnimationFrame(()=>requestAnimationFrame(drawNetworkArrows));
+    else hidePopover();
   }
 
   function featureVisible(f){
@@ -411,7 +1118,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
           <div class="panel-heading">
             <h3 class="panel-title">${esc(f.name)}</h3>
             <span class="feature-actions">
-              <span class="drag-grip" title="Перетащить Ф-л" aria-hidden="true">⠿</span>
+              <span class="drag-grip" title="Зажмите и перетащите функционал" aria-label="Перетащить функционал">↕ Перетащить</span>
               <button class="btn btn-default btn-xs" data-action="edit-feature" data-fi="${fi}">Изм.</button>
               <button class="btn btn-danger btn-xs" data-action="delete-feature" data-fi="${fi}">×</button>
             </span>
@@ -419,14 +1126,29 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
           <div class="panel-body">
             <div class="feature-tags">
               <span class="label ${moneyLabel(mp.level)}">${esc(mp.level)}</span>
-              <span class="label label-info">${f.tasks.length} задач</span>
+              <span class="label-circle" title="Количество задач">${f.tasks.length}</span>
             </div>
           </div>
         </div>
         <div class="task-column">
           <div class="task-toolbar">
-            <span class="count">${tasks.length} отображается</span>
-            <button class="btn btn-default btn-xs" data-action="toggle" data-fi="${fi}">${isCollapsed?"Показать":"Свернуть"}</button>
+            <button
+              class="btn btn-default btn-xs task-visibility-btn"
+              data-action="toggle"
+              data-fi="${fi}"
+              title="${isCollapsed?"Показать":"Свернуть"}"
+              aria-label="${isCollapsed?"Показать":"Свернуть"}"
+            >
+              ${isCollapsed?`
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2.2 12s3.5-6 9.8-6 9.8 6 9.8 6-3.5 6-9.8 6S2.2 12 2.2 12Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                  <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                </svg>`:`
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 5l18 14M2.2 12s3.5-6 9.8-6c2.1 0 3.9.7 5.3 1.6M21.8 12s-3.5 6-9.8 6c-2.1 0-3.9-.7-5.3-1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>`}
+              <span class="task-count-badge">${tasks.length}</span>
+            </button>
           </div>
           <div class="task-list ${isCollapsed?"collapsed":""}">
             <div class="list-group">
@@ -448,6 +1170,9 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
         </div>`;
       host.appendChild(row);
     })
+    host.style.setProperty("--feature-count", Math.max(1, shown));
+    const board=$("networkBoard");
+    if(board) board.style.setProperty("--feature-count", Math.max(1, shown));
     if(!shown)host.innerHTML=`<div class="no-results">По запросу ничего не найдено в этом модуле.</div>`;
     bindPopover();
     bindFeatureDragAndDrop();
@@ -469,7 +1194,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
       if(!canDrag)return;
 
       panel.addEventListener("dragstart",e=>{
-        if(e.target.closest("button")){e.preventDefault();return}
+        if(!e.target.closest(".drag-grip")){e.preventDefault();return}
         const fi=Number(row.dataset.fi);
         row.classList.add("dragging");
         e.dataTransfer.effectAllowed="move";
@@ -536,15 +1261,16 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     if(!cards.length)return;
 
     const br=board.getBoundingClientRect();
-    const rr=root.getBoundingClientRect();
-    const width=board.clientWidth;
+    const width=Math.max(board.clientWidth,board.scrollWidth);
     const height=board.scrollHeight;
     svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
+    svg.setAttribute("width",width);
     svg.setAttribute("height",height);
+    svg.style.width=width+"px";
 
-    const sx=rr.left+rr.width/2-br.left;
-    const sy=rr.bottom-br.top+2;
-    const branchY=sy+27;
+    const firstRect=cards[0].getBoundingClientRect();
+    const sx=width/2;
+    const sy=Math.max(6, firstRect.top-br.top-30);
 
     cards.forEach(card=>{
       const cr=card.getBoundingClientRect();
@@ -600,9 +1326,9 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 
   function featureModal(fi=null){
     const m=state[active],f=fi===null?{name:"",why:"",monetization:"Средний. ",tasks:[]}:m.features[fi],mp=money(f.monetization);
-    openModal(`<div class="modal-header"><h4 class="modal-title">${fi===null?"Добавить Ф-л":"Редактировать Ф-л"}</h4></div>
+    openModal(`<div class="modal-header"><h4 class="modal-title">${fi===null?"Добавить функционал":"Редактировать функционал"}</h4></div>
       <div class="modal-body">
-        <div class="form-group"><label>Ф-л</label><input id="fName" class="form-control" value="${esc(f.name)}"></div>
+        <div class="form-group"><label>Функционал</label><input id="fName" class="form-control" value="${esc(f.name)}"></div>
         <div class="form-group"><label>Зачем / какую боль закрывает</label><textarea id="fWhy" class="form-control">${esc(f.why)}</textarea></div>
         <div class="form-group"><label>Перспектива монетизации</label><select id="fLevel" class="form-control">${["Высокий","Средний","Низкий"].map(x=>`<option ${x===mp.level?"selected":""}>${x}</option>`).join("")}</select></div>
         <div class="form-group"><label>Обоснование</label><textarea id="fReason" class="form-control">${esc(mp.reason)}</textarea></div>
@@ -615,7 +1341,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     const opts=[...new Set([...statuses,t.status].filter(Boolean))];
     openModal(`<div class="modal-header"><h4 class="modal-title">${ti===null?"Добавить доработку":"Редактировать доработку"}</h4></div>
       <div class="modal-body">
-        <div class="form-group"><label>Ф-л</label><select id="tFeature" class="form-control">${m.features.map((x,i)=>`<option value="${i}" ${i===fi?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
+        <div class="form-group"><label>Функционал</label><select id="tFeature" class="form-control">${m.features.map((x,i)=>`<option value="${i}" ${i===fi?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
         <div class="form-group"><label>Номер задачи</label><input id="tNumber" class="form-control" value="${esc(t.number)}" placeholder="Например 55248"></div>
         <div class="form-group"><label>Статус</label><select id="tStatus" class="form-control">${opts.map(x=>`<option ${x===t.status?"selected":""}>${esc(x)}</option>`).join("")}</select></div>
         <div class="form-group"><label>Доработка</label><textarea id="tTitle" class="form-control">${esc(t.title)}</textarea></div>
@@ -627,6 +1353,21 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     openModal(`<div class="modal-header"><h4 class="modal-title">Редактировать модуль</h4></div><div class="modal-body"><div class="form-group"><label>Название модуля</label><input id="mName" class="form-control" value="${esc(m.name)}"></div></div><div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Отмена</button> <button class="btn btn-primary" data-modal="save-module">Сохранить</button></div>`)
   }
 
+  function descriptionModal(){
+    const d=state[active].description||{};
+    openModal(`<div class="modal-header"><h4 class="modal-title">Редактировать описание продукта</h4></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Пользователи</label><textarea id="dUsers" class="form-control">${esc(d.users||"")}</textarea></div>
+        <div class="form-group"><label>Выгодоприобретатели</label><textarea id="dBeneficiaries" class="form-control">${esc(d.beneficiaries||"")}</textarea></div>
+        <div class="form-group"><label>Область применения</label><textarea id="dArea" class="form-control">${esc(d.area||"")}</textarea></div>
+        <div class="form-group"><label>Функциональное описание</label><textarea id="dFunctional" class="form-control">${esc(d.functional||"")}</textarea></div>
+        <div class="form-group"><label>Выгоды применения</label><textarea id="dBenefits" class="form-control">${esc(d.benefits||"")}</textarea></div>
+        <div class="form-group"><label>Конкуренты</label><textarea id="dCompetitors" class="form-control">${esc(d.competitors||"")}</textarea></div>
+        <div class="form-group"><label>УТП</label><textarea id="dUsp" class="form-control">${esc(d.usp||"")}</textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Отмена</button> <button class="btn btn-primary" data-modal="save-description">Сохранить</button></div>`)
+  }
+
   document.addEventListener("click",e=>{
     const a=e.target.closest("[data-action]");
     if(a){
@@ -636,7 +1377,7 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
       if(act==="add-task"){taskModal(fi,null);return}
       if(act==="edit-task"){taskModal(fi,ti);return}
       if(act==="delete-task"&&confirm("Удалить доработку?")){state[active].features[fi].tasks.splice(ti,1);save();render();return}
-      if(act==="delete-feature"&&confirm("Удалить Ф-л и все его доработки?")){state[active].features.splice(fi,1);save();render();return}
+      if(act==="delete-feature"&&confirm("Удалить функционал и все его доработки?")){state[active].features.splice(fi,1);save();render();return}
     }
     const b=e.target.closest("[data-modal]");
     if(!b)return;
@@ -645,6 +1386,18 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     if(act==="save-module"){
       const name=$("mName").value.trim();if(!name)return;
       state[active].name=name;save();closeModal();render();return
+    }
+    if(act==="save-description"){
+      state[active].description={
+        users:$("dUsers").value.trim(),
+        beneficiaries:$("dBeneficiaries").value.trim(),
+        area:$("dArea").value.trim(),
+        functional:$("dFunctional").value.trim(),
+        benefits:$("dBenefits").value.trim(),
+        competitors:$("dCompetitors").value.trim(),
+        usp:$("dUsp").value.trim()
+      };
+      save();closeModal();render();return
     }
     if(act==="save-feature"){
       const raw=b.dataset.fi,name=$("fName").value.trim();if(!name)return;
@@ -664,22 +1417,147 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
   $("searchInput").oninput=render;$("showClosed").onchange=render;
   window.addEventListener("resize",()=>requestAnimationFrame(drawNetworkArrows));
+  $("roadmapView").addEventListener("scroll",()=>requestAnimationFrame(drawNetworkArrows));
   $("editModuleBtn").onclick=moduleModal;$("addFeatureBtn").onclick=()=>featureModal(null);
+  $("editDescriptionBtn").onclick=descriptionModal;
+  $("toggleAllBtn").onclick=toggleAllFeatures;
+  $("moduleViewTabs").addEventListener("click",e=>{
+    const a=e.target.closest("[data-view]");if(!a)return;
+    e.preventDefault();viewMode=a.dataset.view;applyViewMode();
+  });
   $("editToggle").onclick=()=>{editMode=!editMode;document.body.classList.toggle("edit-mode",editMode);$("editToggle").textContent=editMode?"Завершить":"Редактировать";$("editToggle").className="btn "+(editMode?"btn-default":"btn-primary");render()};
 
   function download(name,content,type){const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),700)}
-  $("exportJson").onclick=()=>download("DNM_карта_развития.json",JSON.stringify(state,null,2),"application/json;charset=utf-8");
-  $("exportCsv").onclick=()=>{
-    const rows=[["Продукт","Ф-л","Зачем / какую боль закрывает","Перспектива монетизации","Доработки"]];
-    state.forEach(m=>m.features.forEach(f=>f.tasks.forEach(t=>rows.push([m.name,f.name,f.why,f.monetization,taskText(t)]))));
-    const quote=v=>`"${String(v??"").replace(/"/g,'""')}"`;
-    download("DNM_карта_развития.csv","\ufeff"+rows.map(r=>r.map(quote).join(";")).join("\r\n"),"text/csv;charset=utf-8")
-  }
-  $("importJsonBtn").onclick=()=>$("importJson").click();
-  $("importJson").onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const x=JSON.parse(await file.text());if(!Array.isArray(x))throw 0;state=x;active=0;save();render()}catch(err){alert("Ожидается JSON, экспортированный этой страницей.")}e.target.value=""}
-  $("resetBtn").onclick=()=>{if(confirm("Вернуть исходные данные из Excel?")){state=clone(initial);active=0;localStorage.removeItem(STORAGE_KEY);$("saveState").textContent="Исходные данные";render()}}
 
-  try {
+  function escapeCsv(v){return `"${String(v??"").replace(/"/g,'""')}"`;}
+
+  function exportStateToCsv(){
+    const header=["Продукт","Пользователи","Выгодоприобретатели","Область применения","Функциональное описание","Выгоды применения","Конкуренты","УТП","Функционал","Зачем / какую боль закрывает","Перспектива монетизации","Номер задачи","Статус задачи","Доработка"];
+    const rows=[header];
+    state.forEach(m=>{
+      const desc=m.description||{};
+      if(!m.features.length){
+        rows.push([m.name,desc.users||"",desc.beneficiaries||"",desc.area||"",desc.functional||"",desc.benefits||"",desc.competitors||"",desc.usp||"","","","","","",""]);
+        return;
+      }
+      m.features.forEach(f=>{
+        if(!f.tasks.length){
+          rows.push([m.name,desc.users||"",desc.beneficiaries||"",desc.area||"",desc.functional||"",desc.benefits||"",desc.competitors||"",desc.usp||"",f.name||"",f.why||"",f.monetization||"","","",""]);
+          return;
+        }
+        f.tasks.forEach(t=>{
+          rows.push([m.name,desc.users||"",desc.beneficiaries||"",desc.area||"",desc.functional||"",desc.benefits||"",desc.competitors||"",desc.usp||"",f.name||"",f.why||"",f.monetization||"",t.number||"",t.status||"",t.title||""]);
+        });
+      });
+    });
+    return "\ufeff"+rows.map(r=>r.map(escapeCsv).join(";")).join("\r\n");
+  }
+
+  function parseCsv(text){
+    const rows=[]; let row=[]; let value=""; let inQuotes=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i], next=text[i+1];
+      if(ch==='"'){
+        if(inQuotes && next==='"'){value+='"';i++;}
+        else inQuotes=!inQuotes;
+      } else if(ch===';' && !inQuotes){
+        row.push(value); value="";
+      } else if((ch==='\n' || ch==='\r') && !inQuotes){
+        if(ch==='\r' && next==='\n') i++;
+        row.push(value); rows.push(row); row=[]; value="";
+      } else {
+        value+=ch;
+      }
+    }
+    if(value!=="" || row.length){row.push(value); rows.push(row);}
+    return rows.filter(r=>r.some(cell=>String(cell||"").trim()!==""));
+  }
+
+  function importStateFromCsv(text){
+    text=text.replace(/^\ufeff/,"");
+    const rows=parseCsv(text);
+    if(rows.length<2) throw new Error("CSV пустой");
+    const header=rows[0].map(x=>String(x||"").trim());
+    const idx=name=>header.indexOf(name);
+    const req=["Продукт","Пользователи","Выгодоприобретатели","Область применения","Функциональное описание","Выгоды применения","Конкуренты","УТП","Функционал","Зачем / какую боль закрывает","Перспектива монетизации","Номер задачи","Статус задачи","Доработка"];
+    if(req.some(x=>idx(x)===-1)) throw new Error("bad");
+    const modules=[]; const byModule=new Map();
+    rows.slice(1).forEach(r=>{
+      const moduleName=String(r[idx("Продукт")]||"").trim();
+      if(!moduleName) return;
+      let module=byModule.get(moduleName);
+      if(!module){
+        module={
+          name:moduleName,
+          description:{
+            users:String(r[idx("Пользователи")]||"").trim(),
+            beneficiaries:String(r[idx("Выгодоприобретатели")]||"").trim(),
+            area:String(r[idx("Область применения")]||"").trim(),
+            functional:String(r[idx("Функциональное описание")]||"").trim(),
+            benefits:String(r[idx("Выгоды применения")]||"").trim(),
+            competitors:String(r[idx("Конкуренты")]||"").trim(),
+            usp:String(r[idx("УТП")]||"").trim()
+          },
+          features:[]
+        };
+        module._featureMap=new Map();
+        byModule.set(moduleName,module);
+        modules.push(module);
+      }
+      const featureName=String(r[idx("Функционал")]||"").trim();
+      if(!featureName) return;
+      let feature=module._featureMap.get(featureName);
+      if(!feature){
+        feature={
+          name:featureName,
+          why:String(r[idx("Зачем / какую боль закрывает")]||"").trim(),
+          monetization:String(r[idx("Перспектива монетизации")]||"").trim(),
+          tasks:[]
+        };
+        module._featureMap.set(featureName,feature);
+        module.features.push(feature);
+      }
+      const taskTitle=String(r[idx("Доработка")]||"").trim();
+      const taskNumber=String(r[idx("Номер задачи")]||"").trim().replace(/^#/,"");
+      const taskStatus=String(r[idx("Статус задачи")]||"").trim();
+      if(taskTitle || taskNumber || taskStatus){
+        feature.tasks.push({number:taskNumber,status:taskStatus || "Планируется",title:taskTitle});
+      }
+    });
+    modules.forEach(m=>delete m._featureMap);
+    return hydrateDescriptions(modules);
+  }
+
+  function closeActionsMenu(){document.querySelector(".actions-dropdown")?.classList.remove("open")}
+  $("actionsToggle").onclick=(e)=>{e.stopPropagation();document.querySelector(".actions-dropdown")?.classList.toggle("open")}
+  document.addEventListener("click",(e)=>{if(!e.target.closest(".actions-dropdown"))closeActionsMenu()})
+
+  $("exportJsonAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития.json",JSON.stringify(state,null,2),"application/json;charset=utf-8")}
+  $("exportCsvAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития_Excel.csv",exportStateToCsv(),"text/csv;charset=utf-8")}
+  $("importJsonAction").onclick=()=>{$("importJson").click();closeActionsMenu()}
+  $("importCsvAction").onclick=()=>{$("importCsv").click();closeActionsMenu()}
+  $("resetAction").onclick=()=>{closeActionsMenu();if(confirm("Вернуть исходные данные из файла?")){state=prioritizeModules(hydrateDescriptions(clone(initial)));active=0;localStorage.removeItem(STORAGE_KEY);render()}}
+
+  $("importJson").onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const x=JSON.parse(await file.text());
+      if(!Array.isArray(x)) throw new Error("bad");
+      state=prioritizeModules(hydrateDescriptions(x));active=0;save();render();
+    }catch(err){alert("Не удалось загрузить JSON. Используйте файл, выгруженный с этой страницы.");}
+    e.target.value="";
+  }
+
+  $("importCsv").onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const text=await file.text();
+      state=prioritizeModules(importStateFromCsv(text));active=0;save();render();
+      alert("Данные из Excel (CSV) загружены.");
+    }catch(err){alert("Не удалось загрузить CSV. Проверьте, что это файл, выгруженный с этой страницы.");}
+    e.target.value="";
+  }
+try {
     render();
   } catch (err) {
     console.error(err);
