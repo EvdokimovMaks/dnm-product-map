@@ -2855,9 +2855,539 @@ button.feature-money-chip.label.money-low{
   height:13px!important;
 }
 
+
+/* v48: visual polish pass */
+
+/* Closed tasks: deliberately quieter than active work, but still readable/clickable. */
+.task-item.closed{
+  background:#F1F3F5!important;
+  color:#8A949E!important;
+  border-bottom-color:#E3E7EA!important;
+}
+
+.task-item.closed .task-id{
+  color:#9AA3AC!important;
+}
+
+.task-item.closed .task-title{
+  color:#858F98!important;
+}
+
+.task-item.closed .task-priority-line{
+  opacity:.42!important;
+}
+
+.task-item.closed .task-actions{
+  opacity:.58;
+}
+
+.task-item.closed:hover{
+  background:#ECEFF2!important;
+}
+
+.task-item.closed:hover .task-actions{
+  opacity:1;
+}
+
+/* Keep closed cards visually secondary even when they are links. */
+.task-item.closed[data-task-url]:hover{
+  background:#ECEFF2!important;
+}
+
+/* General spacing polish */
+.stage-group{
+  border-color:#E3E7EB!important;
+}
+.stage-group-head{
+  background:#F6F8F9!important;
+}
+.feature-panel{
+  box-shadow:0 1px 2px rgba(32,41,54,.035)!important;
+}
+.feature-panel:hover{
+  box-shadow:0 2px 7px rgba(32,41,54,.07)!important;
+}
+
+/* ===== Mobile / narrow layout pass ===== */
+@media(max-width:760px){
+  html,body{
+    overflow-x:hidden!important;
+  }
+
+  .brandbar{
+    height:3px!important;
+  }
+
+  .topbar{
+    position:static!important;
+    height:auto!important;
+  }
+
+  .topbar-inner{
+    display:grid!important;
+    grid-template-columns:auto 1fr!important;
+    grid-template-areas:
+      "logo title"
+      "toolbar toolbar"!important;
+    gap:8px 10px!important;
+    padding:10px 10px 8px!important;
+    align-items:center!important;
+  }
+
+  .product-title{
+    display:contents!important;
+  }
+
+  .infotech-logo-img{
+    grid-area:logo!important;
+    width:96px!important;
+    justify-self:start!important;
+  }
+
+  .product-title h1{
+    grid-area:title!important;
+    justify-self:end!important;
+    text-align:right!important;
+    white-space:normal!important;
+    font-size:14px!important;
+    line-height:1.18!important;
+  }
+
+  .toolbar{
+    grid-area:toolbar!important;
+    width:100%!important;
+    justify-self:stretch!important;
+    justify-content:flex-end!important;
+    gap:6px!important;
+  }
+
+  .toolbar .btn{
+    min-height:32px!important;
+  }
+
+  .save-state{
+    display:inline-block!important;
+    margin-right:auto!important;
+    text-align:left!important;
+    font-size:9.5px!important;
+  }
+
+  .module-tabsbar{
+    position:static!important;
+  }
+
+  .module-tabs-inner{
+    display:block!important;
+    padding:6px 8px 2px!important;
+  }
+
+  .module-nav-wrap{
+    width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:thin!important;
+  }
+
+  .modules-horizontal{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:4px!important;
+    min-width:max-content!important;
+    padding:0 0 4px!important;
+  }
+
+  .modules-horizontal>li>a{
+    padding:8px 10px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+
+  .module-subtabs-inner.compact-viewbar{
+    padding:6px 8px 4px!important;
+  }
+
+  .compact-topline{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:6px!important;
+    overflow:visible!important;
+  }
+
+  .compact-topline .nav-tabs{
+    width:100%!important;
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .compact-topline .nav-tabs>li{
+    flex:1 1 50%!important;
+  }
+
+  .compact-topline .nav-tabs>li>a{
+    width:100%!important;
+    text-align:center!important;
+    padding:8px 10px!important;
+    font-size:11px!important;
+  }
+
+  .compact-map-controls{
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+
+  .compact-search{
+    width:100%!important;
+    flex:1 1 auto!important;
+  }
+
+  .compact-search .form-control{
+    height:34px!important;
+    font-size:13px!important;
+  }
+
+  /* Keep progress readable; it can scroll horizontally if proportions make labels too narrow. */
+  .compact-status-rail{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    margin-top:5px!important;
+  }
+
+  #summaryStrip{
+    min-width:390px!important;
+  }
+
+  #summaryStrip .compact-progress-bar{
+    height:21px!important;
+    min-height:21px!important;
+  }
+
+  #summaryStrip .compact-progress-bar > .summary-progress-segment{
+    height:21px!important;
+    min-height:21px!important;
+    min-width:100px!important;
+    padding:0 6px!important;
+  }
+
+  #summaryStrip .progress-segment-label{
+    font-size:10.5px!important;
+    line-height:21px!important;
+  }
+
+  .main{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 8px 24px!important;
+    margin:0!important;
+  }
+
+  /* Native horizontal swipe is more useful than the desktop scrollbar on phones. */
+  .top-scroll{
+    display:none!important;
+  }
+
+  #roadmapView{
+    width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    -webkit-overflow-scrolling:touch!important;
+    scroll-snap-type:x proximity!important;
+    scrollbar-width:thin!important;
+    margin-top:6px!important;
+  }
+
+  #roadmapView::-webkit-scrollbar{
+    height:6px!important;
+  }
+
+  .network-board{
+    width:max-content!important;
+    min-width:100%!important;
+  }
+
+  .feature-grid{
+    display:grid!important;
+    grid-template-columns:repeat(var(--feature-count,1), calc(100vw - 24px))!important;
+    gap:10px!important;
+    width:max-content!important;
+    min-width:max-content!important;
+    padding:0!important;
+  }
+
+  .feature-row{
+    width:calc(100vw - 24px)!important;
+    min-width:calc(100vw - 24px)!important;
+    scroll-snap-align:start!important;
+  }
+
+  .network-root-wrap{
+    display:none!important;
+  }
+
+  .network-svg{
+    display:none!important;
+  }
+
+  .feature-panel .panel-heading{
+    min-height:44px!important;
+    padding:9px 48px 6px 10px!important;
+  }
+
+  .feature-panel .panel-title{
+    font-size:13px!important;
+    line-height:1.3!important;
+  }
+
+  .feature-tags{
+    min-height:25px!important;
+  }
+
+  .feature-money-chip{
+    height:22px!important;
+    min-height:22px!important;
+    font-size:11px!important;
+  }
+
+  .feature-actions .icon-btn,
+  .task-actions .icon-btn{
+    width:24px!important;
+    height:24px!important;
+    min-width:24px!important;
+    flex-basis:24px!important;
+  }
+
+  .feature-actions .icon-btn svg,
+  .task-actions .icon-btn svg{
+    width:14px!important;
+    height:14px!important;
+  }
+
+  .feature-actions{
+    top:4px!important;
+    right:3px!important;
+  }
+
+  .stage-group{
+    margin-bottom:7px!important;
+  }
+
+  .stage-group-head{
+    min-height:30px!important;
+    padding:5px 7px!important;
+  }
+
+  .stage-label{
+    font-size:9.5px!important;
+    max-width:calc(100vw - 90px)!important;
+  }
+
+  .task-item{
+    min-height:50px!important;
+    padding:8px 54px 8px 12px!important;
+  }
+
+  .task-title,
+  .task-id{
+    font-size:11.5px!important;
+  }
+
+  .task-actions{
+    top:4px!important;
+    right:3px!important;
+  }
+
+  .add-task{
+    min-height:34px!important;
+  }
+
+  .add-feature-wrap{
+    text-align:left!important;
+    margin-top:10px!important;
+  }
+
+  .add-feature{
+    width:100%!important;
+    min-height:36px!important;
+  }
+
+  /* Description tab */
+  .product-description{
+    margin:6px 0 20px!important;
+  }
+
+  .product-info-row{
+    grid-template-columns:minmax(0,1fr) 28px!important;
+    min-height:0!important;
+    padding:12px 8px 11px 10px!important;
+  }
+
+  .product-info-title{
+    font-size:13px!important;
+    margin-bottom:8px!important;
+  }
+
+  .product-info-text{
+    font-size:11px!important;
+    line-height:1.5!important;
+  }
+
+  /* Modals fit on phone screens. */
+  .modal{
+    padding:12px 8px!important;
+  }
+
+  .modal-dialog{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+
+  .modal-body{
+    padding:12px!important;
+  }
+
+  .modal-header,
+  .modal-footer{
+    padding:11px 12px!important;
+  }
+
+  textarea.form-control{
+    min-height:110px!important;
+  }
+
+  .actions-menu{
+    position:fixed!important;
+    left:8px!important;
+    right:8px!important;
+    top:auto!important;
+    bottom:10px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-height:70vh!important;
+    overflow-y:auto!important;
+  }
+}
+
+
+/* v49: password access */
+body.auth-pending{
+  overflow:hidden!important;
+}
+
+body.auth-pending > :not(#authGate){
+  visibility:hidden!important;
+}
+
+.auth-gate{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:#F4F6F8;
+  visibility:visible!important;
+}
+
+.auth-gate.is-hidden{
+  display:none!important;
+}
+
+.auth-card{
+  width:min(390px,100%);
+  padding:28px;
+  background:#fff;
+  border:1px solid #DDE2E8;
+  box-shadow:0 14px 36px rgba(32,41,54,.14);
+}
+
+.auth-kicker{
+  margin-bottom:14px;
+  color:#6F7FC1;
+  font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+}
+
+.auth-card h1{
+  margin:0 0 8px;
+  color:#2F3944;
+  font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;
+  font-size:20px;
+  line-height:1.25;
+}
+
+.auth-card p{
+  margin:0 0 20px;
+  color:#71808E;
+  font-size:12px;
+}
+
+.auth-label{
+  display:block;
+  margin-bottom:6px;
+  color:#4C5966;
+  font-size:11px;
+  font-weight:700;
+}
+
+.auth-input{
+  width:100%!important;
+  height:38px!important;
+  margin-bottom:8px!important;
+  font-size:14px!important;
+}
+
+.auth-submit{
+  width:100%;
+  height:38px;
+  margin-top:8px;
+}
+
+.auth-submit[disabled]{
+  opacity:.65;
+  cursor:wait;
+}
+
+.auth-error{
+  min-height:17px;
+  color:#B04F4A;
+  font-size:11px;
+  line-height:1.4;
+}
+
+@media(max-width:520px){
+  .auth-gate{
+    align-items:flex-start;
+    padding:60px 14px 20px;
+  }
+  .auth-card{
+    padding:22px 18px;
+  }
+  .auth-card h1{
+    font-size:18px;
+  }
+}
+
 </style>
 </head>
-<body>
+<body class="auth-pending">
+<div id="authGate" class="auth-gate" aria-live="polite">
+  <form id="authForm" class="auth-card" autocomplete="on">
+    <div class="auth-kicker">INFOTECH</div>
+    <h1>DNM: карта развития продуктов</h1>
+    <p>Введите пароль для доступа к проекту.</p>
+    <label class="auth-label" for="authPassword">Пароль</label>
+    <input id="authPassword" class="form-control auth-input" type="password" name="password"
+           autocomplete="current-password" placeholder="Пароль" required>
+    <div id="authError" class="auth-error" role="alert"></div>
+    <button id="authSubmit" class="btn btn-primary auth-submit" type="submit">Войти</button>
+  </form>
+</div>
 <div class="brandbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
 <header class="topbar">
@@ -2882,6 +3412,12 @@ button.feature-money-chip.label.money-low{
           <button id="exportJsonAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5v16h3M16 4h3v16h-3M10 9h4m-4 3h4m-4 3h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span>Выгрузить JSON</span></button>
           <button id="importJsonAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5v16h3M16 4h3v16h-3M12 16V8m0 0-3 3m3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Загрузить JSON</span></button>
           <button id="resetAction" class="actions-item danger" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3m-8 0 1 13h8l1-13M10 10v7M14 10v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Сбросить данные</span></button>
+          <button id="logoutAction" class="actions-item" type="button">
+            <span class="actions-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M10 5H5v14h5M13 8l4 4-4 4M8 12h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span>Выйти</span>
+          </button>
         </div>
       </div>
       <input id="importJson" type="file" accept=".json,application/json" hidden>
@@ -2959,6 +3495,7 @@ button.feature-money-chip.label.money-low{
 (function(){
   const STORAGE_KEY="infotech-dnm-product-map-v16";
   const REMOTE_API="/api/product-map";
+  const AUTH_API="/api/auth";
   let remoteSaveTimer=null;
   let remoteSaving=false;
   let remoteLoadDone=false;
@@ -2970,6 +3507,85 @@ button.feature-money-chip.label.money-low{
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const clone=v=>JSON.parse(JSON.stringify(v));
   const closed=t=>String(t.status||"").toLowerCase()==="закрыто";
+
+  let appStarted=false;
+
+  function showAuth(message=""){
+    document.body.classList.add("auth-pending");
+    $("authGate")?.classList.remove("is-hidden");
+    if($("authError")) $("authError").textContent=message;
+    setTimeout(()=>$("authPassword")?.focus(),0);
+  }
+
+  function unlockAuth(){
+    document.body.classList.remove("auth-pending");
+    $("authGate")?.classList.add("is-hidden");
+    if($("authError")) $("authError").textContent="";
+  }
+
+  async function authStatus(){
+    const response=await fetch(AUTH_API,{
+      method:"GET",
+      cache:"no-store",
+      credentials:"same-origin"
+    });
+    let payload={};
+    try{payload=await response.json()}catch(e){}
+    if(response.status===503){
+      throw new Error(payload.error||"Пароль доступа не настроен на сервере");
+    }
+    return response.ok && payload.authenticated===true;
+  }
+
+  async function loginWithPassword(password){
+    const response=await fetch(AUTH_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      cache:"no-store",
+      credentials:"same-origin",
+      body:JSON.stringify({password})
+    });
+    let payload={};
+    try{payload=await response.json()}catch(e){}
+    if(!response.ok){
+      throw new Error(payload.error||"Неверный пароль");
+    }
+    return payload.authenticated===true;
+  }
+
+  async function logout(){
+    try{
+      await fetch(AUTH_API,{
+        method:"DELETE",
+        cache:"no-store",
+        credentials:"same-origin"
+      });
+    }catch(e){}
+    location.reload();
+  }
+
+  function startApp(){
+    if(appStarted)return;
+    appStarted=true;
+    unlockAuth();
+    bindScrollSync();
+    render();
+    loadRemoteState();
+  }
+
+  async function initAuth(){
+    showAuth("");
+    try{
+      if(await authStatus()){
+        startApp();
+      }else{
+        showAuth("");
+      }
+    }catch(err){
+      console.error(err);
+      showAuth(err.message||"Не удалось проверить доступ");
+    }
+  }
 
   function prioritizeModules(data){
     const priority=["Модуль обучения","Автопроверка"];
@@ -4259,11 +4875,32 @@ renderFeatures(m);
     return hydrateDescriptions(modules);
   }
 
+  $("authForm")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const password=$("authPassword")?.value||"";
+    const submit=$("authSubmit");
+    if(submit)submit.disabled=true;
+    if($("authError"))$("authError").textContent="";
+    try{
+      if(await loginWithPassword(password)){
+        if($("authPassword"))$("authPassword").value="";
+        startApp();
+      }else{
+        showAuth("Неверный пароль");
+      }
+    }catch(err){
+      showAuth(err.message||"Не удалось выполнить вход");
+    }finally{
+      if(submit)submit.disabled=false;
+    }
+  });
+
   function closeActionsMenu(){document.querySelector(".actions-dropdown")?.classList.remove("open")}
   $("actionsToggle").onclick=(e)=>{e.stopPropagation();document.querySelector(".actions-dropdown")?.classList.toggle("open")}
   document.addEventListener("click",(e)=>{if(!e.target.closest(".actions-dropdown"))closeActionsMenu()})
 
   $("versionHistoryAction").onclick=versionHistoryModal;
+  $("logoutAction").onclick=()=>{closeActionsMenu();logout()};
   $("exportJsonAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития.json",JSON.stringify(state,null,2),"application/json;charset=utf-8")}
   $("exportCsvAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития_Excel.csv",exportStateToCsv(),"text/csv;charset=utf-8")}
   $("importJsonAction").onclick=()=>{$("importJson").click();closeActionsMenu()}
@@ -4290,15 +4927,10 @@ renderFeatures(m);
     e.target.value="";
   }
 try {
-    bindScrollSync();
-    render();
-    loadRemoteState();
+    initAuth();
   } catch (err) {
     console.error(err);
-    const host=document.getElementById("featureRows");
-    if(host){
-      host.innerHTML='<div class="alert alert-danger"><strong>Ошибка загрузки карты.</strong> Перезагрузите страницу. Если ошибка повторяется, используйте новую версию файла.</div>';
-    }
+    showAuth("Ошибка инициализации входа");
   }
 })();
 </script>
