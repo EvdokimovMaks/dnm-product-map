@@ -1848,6 +1848,83 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
   color:#fff;
 }
 
+
+/* v32: roadmap uses the full viewport width */
+html, body{
+  width:100%;
+  max-width:none;
+}
+
+.shell{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+}
+
+.main{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  box-sizing:border-box!important;
+}
+
+/* The horizontal scrolling area now reaches both edges of the page. */
+#roadmapView{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Fill the viewport when all columns fit; grow beyond it when scrolling is needed. */
+.network-board{
+  width:max(
+    100%,
+    calc(
+      var(--feature-count, 1) * 285px +
+      (var(--feature-count, 1) - 1) * 16px
+    )
+  )!important;
+  min-width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+
+.feature-grid{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  grid-template-columns:repeat(
+    var(--feature-count, 1),
+    minmax(285px, 1fr)
+  )!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+
+/* No dead side zones around the roadmap. */
+.network-root-wrap,
+.add-feature-wrap{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+
+/* Top scrollbar remains edge-to-edge and matches the real board width. */
+.top-scroll{
+  left:0!important;
+  right:auto!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+
 </style>
 </head>
 <body>
