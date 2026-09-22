@@ -1724,41 +1724,128 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 }
 
 
-/* v28: priority colors use the LABEL BACKGROUND fill, not the label text color */
+/* v28: full-width top scrollbar + updated monetization palette */
 
-/* High = label-light-red fill */
-.money-high{
-  background:#F4EDED!important;
-  color:#33383D!important;
-  border-color:#F4EDED!important;
+/* Horizontal scrollbar spans the entire viewport, not only the content shell. */
+.top-scroll{
+  position:relative!important;
+  left:50%!important;
+  right:50%!important;
+  width:100vw!important;
+  max-width:none!important;
+  margin-left:-50vw!important;
+  margin-right:-50vw!important;
+  box-sizing:border-box!important;
 }
 
-/* Medium = label-light-yellow2 fill */
+/* High monetization priority = common-ui label-dark-green. */
+.money-high{
+  color:#FFFFFF!important;
+  background:#5E7549!important;
+  border-color:#4E643D!important;
+}
+
+/* Medium monetization priority keeps the label-light-yellow2 fill. */
 .money-medium{
+  color:#3F4348!important;
   background:#F9F8E1!important;
-  color:#33383D!important;
-  border-color:#F9F8E1!important;
+  border-color:#ECE5A5!important;
 }
 
 /* Low priority remains unchanged. */
 
-/* Task side indicator uses the same FILL colors */
+/* Task side priority marker follows the same semantic palette. */
 .task-priority-line.priority-high,
 .priority-legend-line.priority-high{
-  background:#F4EDED!important;
+  background:#5E7549!important;
 }
-
 .task-priority-line.priority-medium,
 .priority-legend-line.priority-medium{
-  background:#F9F8E1!important;
+  background:#F9E9A6!important;
 }
 
-/* The light fills need a slightly wider strip to remain readable. */
-.task-priority-line{
-  width:5px!important;
+
+/* v29: shared server persistence status */
+.save-state{
+  display:inline-block!important;
+  min-width:92px;
+  text-align:right;
+  color:#7A858F!important;
+  font-size:10px!important;
+  white-space:nowrap;
 }
-.task-priority-line:hover{
-  width:7px!important;
+
+
+/* v30: shared editing + version history */
+.history-note{
+  margin:0 0 12px;
+  color:#77828C;
+  font-size:11px;
+  line-height:1.45;
+}
+.history-list{
+  border-top:1px solid #E5E9ED;
+}
+.history-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:11px 0;
+  border-bottom:1px solid #E5E9ED;
+}
+.history-row.current{
+  background:#FAFCFD;
+}
+.history-main{
+  min-width:0;
+}
+.history-date{
+  color:#37424D;
+  font-size:12px;
+  font-weight:700;
+}
+.history-meta{
+  margin-top:3px;
+  color:#7A858F;
+  font-size:10.5px;
+}
+.history-loading,.history-empty{
+  padding:16px 0;
+  color:#7A858F;
+  font-size:12px;
+}
+
+
+/* v31: task count badge on module tabs */
+.modules-horizontal>li>a{
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+}
+.module-tab-title{
+  display:inline-block;
+}
+.module-task-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:13px;
+  height:13px;
+  padding:0 3px;
+  box-sizing:border-box;
+  border-radius:1px;
+  background:#B55E5A;
+  color:#fff;
+  font-size:9px;
+  line-height:13px;
+  font-weight:700;
+  vertical-align:middle;
+  flex:0 0 auto;
+}
+.modules-horizontal>li.active>a .module-task-count{
+  background:#B55E5A;
+  color:#fff;
 }
 
 </style>
@@ -1779,6 +1866,12 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
         <div id="actionsMenu" class="actions-menu">
           <button id="exportCsvAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4M12 10v7m0 0-3-3m3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Выгрузить Excel (CSV)</span></button>
           <button id="importCsvAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4M12 17v-7m0 0-3 3m3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Загрузить Excel (CSV)</span></button>
+          <button id="versionHistoryAction" class="actions-item" type="button">
+            <span class="actions-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6M4 4v4.6h4.6M12 7v5l3.2 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span>История версий</span>
+          </button>
           <button id="exportJsonAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5v16h3M16 4h3v16h-3M10 9h4m-4 3h4m-4 3h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span>Выгрузить JSON</span></button>
           <button id="importJsonAction" class="actions-item" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5v16h3M16 4h3v16h-3M12 16V8m0 0-3 3m3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Загрузить JSON</span></button>
           <button id="resetAction" class="actions-item danger" type="button"><span class="actions-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3m-8 0 1 13h8l1-13M10 10v7M14 10v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Сбросить данные</span></button>
@@ -1858,6 +1951,11 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
 <script>
 (function(){
   const STORAGE_KEY="infotech-dnm-product-map-v16";
+  const REMOTE_API="/api/product-map";
+  let remoteSaveTimer=null;
+  let remoteSaving=false;
+  let remoteLoadDone=false;
+
   const initial=JSON.parse(document.getElementById("initialData").textContent);
   const productDescriptions=JSON.parse(document.getElementById("productDescriptions").textContent);
 
@@ -1947,14 +2045,187 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     }catch(e){}
     return clone(initial);
   }
-  function save(){
+  function saveLocal(){
     try{
       localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
       const status=$("saveState");
-      if(status)status.textContent="Сохранено";
+      if(status)status.textContent="Сохранено локально";
     }catch(e){
       const status=$("saveState");
-      if(status)status.textContent="Не удалось сохранить";
+      if(status)status.textContent="Не удалось сохранить локально";
+    }
+  }
+
+  function setSaveState(text){
+    const status=$("saveState");
+    if(status)status.textContent=text;
+  }
+
+  async function putRemoteState(data){
+    if(remoteSaving)return false;
+    remoteSaving=true;
+    try{
+      const response=await fetch(REMOTE_API,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json"},
+        cache:"no-store",
+        body:JSON.stringify({data})
+      });
+
+      let payload={};
+      try{ payload=await response.json(); }catch(e){}
+
+      if(!response.ok){
+        throw new Error(payload.error||"Ошибка серверного сохранения");
+      }
+
+      setSaveState(payload.unchanged?"Без изменений":"Сохранено");
+      return true;
+    }catch(err){
+      console.error("Remote save failed",err);
+      setSaveState("Сохранено только на этом устройстве");
+      return false;
+    }finally{
+      remoteSaving=false;
+    }
+  }
+
+  async function getVersionHistory(){
+    const response=await fetch(`${REMOTE_API}?history=1`,{method:"GET",cache:"no-store"});
+    let payload={};
+    try{payload=await response.json()}catch(e){}
+    if(!response.ok)throw new Error(payload.error||"Не удалось загрузить историю");
+    return payload;
+  }
+
+  function formatVersionDate(value){
+    if(!value)return "Дата неизвестна";
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime()))return value;
+    return d.toLocaleString("ru-RU",{
+      day:"2-digit",month:"2-digit",year:"numeric",
+      hour:"2-digit",minute:"2-digit",second:"2-digit"
+    });
+  }
+
+  function versionStatsText(v){
+    const parts=[];
+    if(Number.isFinite(v.moduleCount))parts.push(`${v.moduleCount} мод.`);
+    if(Number.isFinite(v.featureCount))parts.push(`${v.featureCount} функц.`);
+    if(Number.isFinite(v.taskCount))parts.push(`${v.taskCount} дораб.`);
+    return parts.join(" · ");
+  }
+
+  async function versionHistoryModal(){
+    closeActionsMenu();
+    openModal(`<div class="modal-header"><h4 class="modal-title">История версий</h4></div>
+      <div class="modal-body"><div class="history-loading">Загрузка истории…</div></div>
+      <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Закрыть</button></div>`);
+
+    try{
+      const payload=await getVersionHistory();
+      const current=payload.current;
+      const history=Array.isArray(payload.history)?payload.history:[];
+      const rows=[];
+
+      if(current){
+        rows.push(`<div class="history-row current">
+          <div class="history-main">
+            <div class="history-date">${esc(formatVersionDate(current.updatedAt))}</div>
+            <div class="history-meta">Текущая версия${current.action==="rollback"?" · восстановлена из истории":""}${versionStatsText(current)?` · ${esc(versionStatsText(current))}`:""}</div>
+          </div>
+          <span class="label label-success">Текущая</span>
+        </div>`);
+      }
+
+      history.forEach(v=>{
+        rows.push(`<div class="history-row">
+          <div class="history-main">
+            <div class="history-date">${esc(formatVersionDate(v.updatedAt))}</div>
+            <div class="history-meta">${v.action==="rollback"?"Откат":"Сохранение"}${versionStatsText(v)?` · ${esc(versionStatsText(v))}`:""}</div>
+          </div>
+          <button class="btn btn-default btn-xs" data-modal="rollback-version" data-version-id="${esc(v.id)}">Восстановить</button>
+        </div>`);
+      });
+
+      $("modalContent").innerHTML=`<div class="modal-header"><h4 class="modal-title">История версий</h4></div>
+        <div class="modal-body">
+          <div class="history-note">Хранятся последние 30 изменённых версий. Перед откатом текущая версия автоматически попадает в историю.</div>
+          <div class="history-list">${rows.join("")||'<div class="history-empty">История пока пуста.</div>'}</div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Закрыть</button></div>`;
+    }catch(err){
+      console.error(err);
+      $("modalContent").innerHTML=`<div class="modal-header"><h4 class="modal-title">История версий</h4></div>
+        <div class="modal-body"><div class="alert alert-danger">${esc(err.message||"Не удалось загрузить историю")}</div></div>
+        <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Закрыть</button></div>`;
+    }
+  }
+
+  async function rollbackVersion(versionId){
+    if(!versionId)return;
+    if(!confirm("Восстановить выбранную версию? Текущая версия останется в истории."))return;
+
+    try{
+      setSaveState("Восстановление…");
+      const response=await fetch(REMOTE_API,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        cache:"no-store",
+        body:JSON.stringify({action:"rollback",versionId})
+      });
+
+      let payload={};
+      try{payload=await response.json()}catch(e){}
+      if(!response.ok)throw new Error(payload.error||"Не удалось восстановить версию");
+      if(!Array.isArray(payload.data))throw new Error("Сервер вернул некорректные данные");
+
+      state=prioritizeModules(hydrateDescriptions(migrateState(payload.data)));
+      active=0;
+      saveLocal();
+      closeModal();
+      render();
+      setSaveState("Версия восстановлена");
+    }catch(err){
+      console.error(err);
+      alert(err.message||"Не удалось восстановить версию");
+      setSaveState("Ошибка восстановления");
+    }
+  }
+
+  function scheduleRemoteSave(){
+    clearTimeout(remoteSaveTimer);
+    remoteSaveTimer=setTimeout(()=>{
+      putRemoteState(clone(state));
+    },350);
+  }
+
+  function save(){
+    saveLocal();
+    scheduleRemoteSave();
+  }
+
+  async function loadRemoteState(){
+    try{
+      const response=await fetch(REMOTE_API,{method:"GET",cache:"no-store"});
+      if(!response.ok)throw new Error("HTTP "+response.status);
+      const payload=await response.json();
+
+      if(Array.isArray(payload.data)&&payload.data.length){
+        state=prioritizeModules(hydrateDescriptions(migrateState(payload.data)));
+        saveLocal();
+        render();
+        setSaveState("Синхронизировано");
+      }else{
+        // На первом запуске сервер пуст. Не затираем локальные данные:
+        // текущая версия будет отправлена при первом редактировании.
+        setSaveState("Сервер готов");
+      }
+      remoteLoadDone=true;
+    }catch(err){
+      console.error("Remote load failed",err);
+      remoteLoadDone=true;
+      setSaveState("Локальный режим");
     }
   }
 
@@ -2030,7 +2301,21 @@ textarea.form-control{height:auto;min-height:90px;resize:vertical}
     const ul=$("moduleNav");ul.innerHTML="";
     state.forEach((m,i)=>{
       const li=document.createElement("li");if(i===active)li.className="active";
-      const a=document.createElement("a");a.href="#";a.textContent=m.name;
+      const a=document.createElement("a");a.href="#";
+
+      const title=document.createElement("span");
+      title.className="module-tab-title";
+      title.textContent=m.name;
+
+      const taskCount=(m.features||[]).reduce((sum,f)=>sum+((f.tasks||[]).length),0);
+      const badge=document.createElement("span");
+      badge.className="module-task-count";
+      badge.textContent=taskCount;
+      badge.title=`Доработок: ${taskCount}`;
+      badge.setAttribute("aria-label",`Доработок: ${taskCount}`);
+
+      a.appendChild(title);
+      a.appendChild(badge);
       a.onclick=e=>{e.preventDefault();active=i;render()};
       li.appendChild(a);ul.appendChild(li);
     })
@@ -2683,6 +2968,7 @@ renderFeatures(m);
     if(!b)return;
     const act=b.dataset.modal;
     if(act==="cancel"){closeModal();return}
+    if(act==="rollback-version"){rollbackVersion(b.dataset.versionId);return}
     if(act==="save-module"){
       const name=$("mName").value.trim();if(!name)return;
       state[active].name=name;save();closeModal();render();return
@@ -2842,11 +3128,12 @@ renderFeatures(m);
   $("actionsToggle").onclick=(e)=>{e.stopPropagation();document.querySelector(".actions-dropdown")?.classList.toggle("open")}
   document.addEventListener("click",(e)=>{if(!e.target.closest(".actions-dropdown"))closeActionsMenu()})
 
+  $("versionHistoryAction").onclick=versionHistoryModal;
   $("exportJsonAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития.json",JSON.stringify(state,null,2),"application/json;charset=utf-8")}
   $("exportCsvAction").onclick=()=>{closeActionsMenu();download("DNM_карта_развития_Excel.csv",exportStateToCsv(),"text/csv;charset=utf-8")}
   $("importJsonAction").onclick=()=>{$("importJson").click();closeActionsMenu()}
   $("importCsvAction").onclick=()=>{$("importCsv").click();closeActionsMenu()}
-  $("resetAction").onclick=()=>{closeActionsMenu();if(confirm("Вернуть исходные данные из файла?")){state=prioritizeModules(hydrateDescriptions(migrateState(clone(initial))));active=0;localStorage.removeItem(STORAGE_KEY);render()}}
+  $("resetAction").onclick=()=>{closeActionsMenu();if(confirm("Вернуть исходные данные из файла?")){state=prioritizeModules(hydrateDescriptions(migrateState(clone(initial))));active=0;save();render()}}
 
   $("importJson").onchange=async e=>{
     const file=e.target.files[0];if(!file)return;
@@ -2870,6 +3157,7 @@ renderFeatures(m);
 try {
     bindScrollSync();
     render();
+    loadRemoteState();
   } catch (err) {
     console.error(err);
     const host=document.getElementById("featureRows");
