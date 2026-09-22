@@ -2681,6 +2681,180 @@ html, body{
   background:#767676!important;
 }
 
+
+/* v44: stages can be reordered directly by dragging the stage header */
+.stage-group-head[draggable="true"]{
+  cursor:grab!important;
+  user-select:none!important;
+}
+
+.stage-group-head[draggable="true"]:active{
+  cursor:grabbing!important;
+}
+
+.stage-group-head.dragging-stage{
+  opacity:.45!important;
+}
+
+.stage-group{
+  position:relative!important;
+}
+
+.stage-group.stage-drop-before:before,
+.stage-group.stage-drop-after:after{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  height:3px!important;
+  background:#6F7FC1!important;
+  z-index:20!important;
+  pointer-events:none!important;
+}
+
+.stage-group.stage-drop-before:before{
+  top:-3px!important;
+}
+
+.stage-group.stage-drop-after:after{
+  bottom:-3px!important;
+}
+
+
+/* v45: compact monetization labels + exact supplied dark-green reference */
+button.feature-money-chip.label{
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  padding:0 8px!important;
+  border-width:1px!important;
+  border-style:solid!important;
+  border-radius:11px!important;
+  box-sizing:border-box!important;
+  font-family:Arial,"Helvetica Neue",sans-serif!important;
+  font-size:11px!important;
+  line-height:20px!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+  box-shadow:none!important;
+}
+
+/* Высокий = label-dark-green, цвет заливки строго по референсу */
+button.feature-money-chip.label.money-high{
+  color:#FFFFFF!important;
+  background:#647D4E!important;
+  background-color:#647D4E!important;
+  border-color:#363636!important;
+}
+
+/* Средний = label-light-yellow2 */
+button.feature-money-chip.label.money-medium{
+  color:#927432!important;
+  background:#F9F8E1!important;
+  background-color:#F9F8E1!important;
+  border-color:#ECE5A5!important;
+}
+
+/* Низкий = label-grey4__outline */
+button.feature-money-chip.label.money-low{
+  color:#767676!important;
+  background:#FFFFFF!important;
+  background-color:#FFFFFF!important;
+  border-color:#767676!important;
+}
+
+button.feature-money-chip.label.money-high:hover,
+button.feature-money-chip.label.money-medium:hover,
+button.feature-money-chip.label.money-low:hover{
+  filter:none!important;
+  box-shadow:none!important;
+}
+
+/* Вертикальные маркеры доработок синхронизированы с теми же приоритетами */
+.task-priority-line.priority-high,
+.priority-legend-line.priority-high{
+  background:#647D4E!important;
+}
+.task-priority-line.priority-medium,
+.priority-legend-line.priority-medium{
+  background:#ECE5A5!important;
+}
+.task-priority-line.priority-low,
+.priority-legend-line.priority-low{
+  background:#767676!important;
+}
+
+
+/* v46: priority chips from supplied common-ui references */
+
+/* Высокий = label-light-green */
+button.feature-money-chip.label.money-high{
+  color:#647D4E!important;
+  background:#EDF5E9!important;
+  background-color:#EDF5E9!important;
+  border-color:#CAE3B8!important;
+}
+
+/* Средний = label-light-yellow2 — без изменений */
+
+/* Низкий = label-default */
+button.feature-money-chip.label.money-low{
+  color:#363636!important;
+  background:#F8F8F8!important;
+  background-color:#F8F8F8!important;
+  border-color:#DCDCDC!important;
+}
+
+/* Маркеры задач синхронизированы с новыми приоритетами */
+.task-priority-line.priority-high,
+.priority-legend-line.priority-high{
+  background:#CAE3B8!important;
+}
+.task-priority-line.priority-low,
+.priority-legend-line.priority-low{
+  background:#DCDCDC!important;
+}
+
+
+/* v47: edit/delete icons without square borders */
+.feature-actions .icon-btn,
+.task-actions .icon-btn{
+  width:20px!important;
+  height:20px!important;
+  min-width:20px!important;
+  flex:0 0 20px!important;
+  padding:1px!important;
+  border:0!important;
+  border-radius:2px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+.feature-actions .icon-btn:hover,
+.task-actions .icon-btn:hover{
+  border:0!important;
+  background:#F2F4F8!important;
+  box-shadow:none!important;
+}
+
+.feature-actions .icon-btn.danger,
+.task-actions .icon-btn.danger{
+  border:0!important;
+  background:transparent!important;
+}
+
+.feature-actions .icon-btn.danger:hover,
+.task-actions .icon-btn.danger:hover{
+  background:#FFF3F3!important;
+}
+
+.feature-actions .icon-btn svg,
+.task-actions .icon-btn svg{
+  width:13px!important;
+  height:13px!important;
+}
+
 </style>
 </head>
 <body>
@@ -3085,7 +3259,7 @@ html, body{
       s==="реализовано"
     ) return "label-primary";
 
-    if(s==="обсуждение и оценка dnm" || s==="обсуждение и оценка") return "label-yellow";
+    if(s==="обсуждение и оценка dnm" || s==="обсуждение и оценка") return "label-info";
     if(s==="закрыто") return "label-success";
     if(s.includes("ждем согласования") || s.includes("ожид")) return "label-warning";
     if(s.includes("аналит") || s.includes("дизайн")) return "label-info";
@@ -3094,17 +3268,33 @@ html, body{
   }
   function moneyLabel(level){return level==="Высокий"?"money-high":level==="Средний"?"money-medium":"money-low"}
 
-  const STAGE_ORDER=[
+  const DEFAULT_STAGE_ORDER=[
     "Обсуждение и оценка DNM","Аналитика и проработка","Дизайн",
     "Планируется (нет задачи)","Backlog","Ждем согласования/оплаты/ДС",
     "Очередь","В работе","Верстка","Code review","Доработки",
     "Тестирование","На проверке постановщиком","Вылить","Реализовано","Закрыто"
   ];
 
+  function getStageOrder(module=state[active]){
+    const stored=Array.isArray(module?.stageOrder)?module.stageOrder:[];
+    const actual=(module?.features||[])
+      .flatMap(f=>(f.tasks||[]).map(t=>String(t.status||"Планируется (нет задачи)")));
+    const result=[];
+    const seen=new Set();
+    [...stored,...DEFAULT_STAGE_ORDER,...actual].forEach(stage=>{
+      const s=String(stage||"").trim();
+      if(!s||seen.has(s))return;
+      seen.add(s);
+      result.push(s);
+    });
+    return result;
+  }
+
   function stageRank(status){
     const s=String(status||"Планируется (нет задачи)");
-    const i=STAGE_ORDER.indexOf(s);
-    return i===-1?STAGE_ORDER.length:i;
+    const order=getStageOrder();
+    const i=order.indexOf(s);
+    return i===-1?order.length:i;
   }
 
   function groupTasksByStage(tasks){
@@ -3310,7 +3500,10 @@ renderFeatures(m);
 
       const groupedTasks=groups.map(([stage,stageTasks])=>`
         <section class="stage-group" data-stage-name="${esc(stage)}" data-task-list-fi="${fi}">
-          <div class="stage-group-head">
+          <div class="stage-group-head"
+               draggable="true"
+               data-drag-stage="${esc(stage)}"
+               title="Перетащите этап, чтобы изменить порядок">
             <span class="stage-label ${labelClass(stage)}">${esc(stage)}</span>
             <span class="stage-count">${stageTasks.length}</span>
           </div>
@@ -3389,9 +3582,31 @@ renderFeatures(m);
   }
 
   function clearDragMarks(){
-    document.querySelectorAll(".feature-row,.task-item,.task-list").forEach(el=>{
-      el.classList.remove("dragging-feature","feature-drop-before","feature-drop-after","dragging-task","task-drop-before","task-drop-after","task-list-drop");
+    document.querySelectorAll(".feature-row,.task-item,.task-list,.stage-group,.stage-group-head").forEach(el=>{
+      el.classList.remove(
+        "dragging-feature","feature-drop-before","feature-drop-after",
+        "dragging-task","task-drop-before","task-drop-after","task-list-drop",
+        "dragging-stage","stage-drop-before","stage-drop-after"
+      );
     });
+  }
+
+  function reorderStage(stageName,targetStage,after){
+    const module=state[active];
+    if(!module||!stageName||!targetStage||stageName===targetStage)return false;
+
+    const order=getStageOrder(module);
+    const from=order.indexOf(stageName);
+    const to=order.indexOf(targetStage);
+    if(from===-1||to===-1)return false;
+
+    order.splice(from,1);
+    let insertAt=order.indexOf(targetStage);
+    if(after)insertAt++;
+    order.splice(Math.max(0,Math.min(insertAt,order.length)),0,stageName);
+
+    module.stageOrder=order;
+    return true;
   }
 
   function insertTaskAtStage(feature,t,stage,beforeIndex=null){
@@ -3407,6 +3622,65 @@ renderFeatures(m);
   }
 
   function bindDragAndDrop(){
+    document.querySelectorAll(".stage-group-head").forEach(head=>{
+      head.addEventListener("dragstart",e=>{
+        if(e.target.closest("button,input,select,textarea,a")){e.preventDefault();return}
+        const stage=head.dataset.dragStage;
+        if(!stage){e.preventDefault();return}
+        dragContext={kind:"stage",stage};
+        justDragged=true;
+        e.dataTransfer.effectAllowed="move";
+        e.dataTransfer.setData("text/plain",JSON.stringify(dragContext));
+        head.classList.add("dragging-stage");
+        hidePopover();
+      });
+      head.addEventListener("dragend",()=>{
+        dragContext=null;
+        clearDragMarks();
+        setTimeout(()=>{justDragged=false},80);
+      });
+    });
+
+    document.querySelectorAll(".stage-group").forEach(group=>{
+      group.addEventListener("dragover",e=>{
+        if(!dragContext||dragContext.kind!=="stage")return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        document.querySelectorAll(".stage-group").forEach(x=>{
+          x.classList.remove("stage-drop-before","stage-drop-after");
+        });
+
+        const head=group.querySelector(".stage-group-head");
+        const r=(head||group).getBoundingClientRect();
+        const after=e.clientY>=r.top+r.height/2;
+        group.classList.add(after?"stage-drop-after":"stage-drop-before");
+        e.dataTransfer.dropEffect="move";
+      });
+
+      group.addEventListener("drop",e=>{
+        if(!dragContext||dragContext.kind!=="stage")return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const targetStage=group.dataset.stageName;
+        const head=group.querySelector(".stage-group-head");
+        const r=(head||group).getBoundingClientRect();
+        const after=e.clientY>=r.top+r.height/2;
+
+        if(reorderStage(dragContext.stage,targetStage,after)){
+          dragContext=null;
+          clearDragMarks();
+          save();
+          render();
+          return;
+        }
+
+        dragContext=null;
+        clearDragMarks();
+      });
+    });
+
     document.querySelectorAll(".feature-panel").forEach(panel=>{
       panel.addEventListener("dragstart",e=>{
         if(e.target.closest("button,input,select,textarea,a")){e.preventDefault();return}
