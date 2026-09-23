@@ -3621,6 +3621,54 @@ body.auth-pending > :not(#authGate){
     if(Number.isNaN(d.getTime()))return "";
     return d.toISOString().slice(0,10);
   };
+  const dateTextValue=value=>{
+    const iso=dateInputValue(value);
+    if(!iso)return "";
+    const [year,month,day]=iso.split("-");
+    return `${day}.${month}.${year}`;
+  };
+
+  const normalizeTaskDateText=value=>{
+    const raw=String(value??"").trim();
+    if(!raw)return "";
+
+    let m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if(m){
+      const y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
+      const dt=new Date(Date.UTC(y,mo-1,d));
+      if(dt.getUTCFullYear()===y&&dt.getUTCMonth()===mo-1&&dt.getUTCDate()===d){
+        return `${String(y).padStart(4,"0")}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      }
+      return null;
+    }
+
+    m=raw.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+    if(m){
+      const d=Number(m[1]),mo=Number(m[2]),y=Number(m[3]);
+      const dt=new Date(Date.UTC(y,mo-1,d));
+      if(dt.getUTCFullYear()===y&&dt.getUTCMonth()===mo-1&&dt.getUTCDate()===d){
+        return `${String(y).padStart(4,"0")}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      }
+      return null;
+    }
+
+    return null;
+  };
+
+  function normalizeTaskDateField(id){
+    const input=$(id);
+    if(!input)return "";
+    const normalized=normalizeTaskDateText(input.value);
+    if(normalized===null){
+      input.classList.add("date-input-invalid");
+      input.focus();
+      return null;
+    }
+    input.classList.remove("date-input-invalid");
+    input.value=normalized?dateTextValue(normalized):"";
+    return normalized||"";
+  }
+
   const quarterIndexFromDate=value=>{
     const s=dateInputValue(value);
     if(!s)return null;
@@ -4664,18 +4712,30 @@ renderFeatures(m);
         let span=1;
         while(i+span<months.length&&isMonthActive(task,months[i+span],row.status))span+=1;
 
-        const canDrag=row.bucket!=="closed";
+        const canPlanAdjust=!dateInputValue(task.actualCloseDate)&&statusBucket(task.status)!=="closed";
         cells+=`
           <td class="roadmap-month-cell roadmap-quarter-span-cell roadmap-quarter-${bucket}"
               colspan="${span}"
               data-roadmap-month-start="${months[i].index}"
               data-roadmap-month-span="${span}">
-            <div class="roadmap-quarter-span roadmap-month-task-bar ${canDrag?"roadmap-task-draggable":""}"
-                 ${canDrag?`draggable="true" data-roadmap-drag-fi="${row.sourceFi}" data-roadmap-drag-ti="${row.sourceTi}"`:""}>
+            <div class="roadmap-quarter-span roadmap-month-task-bar ${canPlanAdjust?"roadmap-task-draggable roadmap-task-resizable":""}"
+                 ${canPlanAdjust?`draggable="true" data-roadmap-drag-fi="${row.sourceFi}" data-roadmap-drag-ti="${row.sourceTi}"`:""}>
+              ${canPlanAdjust?`<span class="roadmap-resize-handle roadmap-resize-left"
+                    draggable="false"
+                    data-roadmap-resize="start"
+                    data-fi="${row.sourceFi}"
+                    data-ti="${row.sourceTi}"
+                    title="Изменить дату планового начала"></span>`:""}
               <div class="roadmap-quarter-bar-content">
                 ${taskLinkHtml(row)}
                 <span class="roadmap-inline-status ${labelClass(status)}">${esc(status)}</span>
               </div>
+              ${canPlanAdjust?`<span class="roadmap-resize-handle roadmap-resize-right"
+                    draggable="false"
+                    data-roadmap-resize="end"
+                    data-fi="${row.sourceFi}"
+                    data-ti="${row.sourceTi}"
+                    title="Изменить дату планового закрытия"></span>`:""}
             </div>
           </td>`;
         i+=span;
@@ -4733,6 +4793,7 @@ renderFeatures(m);
       </div>`;
 
     bindRoadmapMonthDrag();
+    bindRoadmapResize();
     requestAnimationFrame(syncTimelineTopScroll);
   }
 
@@ -4750,6 +4811,116 @@ renderFeatures(m);
     return start+offset;
   }
 
+  function roadmapMonthAtPoint(clientX,clientY){
+    const el=document.elementFromPoint(clientX,clientY);
+    let cell=el?.closest?.("[data-roadmap-month-start]")||null;
+
+    if(!cell){
+      const headers=[...document.querySelectorAll("#roadmapTable .roadmap-month-head[data-roadmap-month-start]")];
+      cell=headers.find(header=>{
+        const r=header.getBoundingClientRect();
+        return clientX>=r.left&&clientX<=r.right;
+      })||null;
+    }
+
+    return cell?roadmapDropMonthIndex(cell,{clientX}):null;
+  }
+
+  function bindRoadmapResize(){
+    const card=$("roadmapScroll");
+    if(!card)return;
+
+    card.querySelectorAll("[data-roadmap-resize]").forEach(handle=>{
+      handle.addEventListener("dragstart",e=>{
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      handle.addEventListener("pointerdown",e=>{
+        e.preventDefault();
+        e.stopPropagation();
+
+        const fi=Number(handle.dataset.fi);
+        const ti=Number(handle.dataset.ti);
+        const side=handle.dataset.roadmapResize;
+        const task=state[active]?.features?.[fi]?.tasks?.[ti];
+
+        if(!task||dateInputValue(task.actualCloseDate)||statusBucket(task.status)==="closed")return;
+
+        const range=roadmapMonthRange(task,task.status);
+        if(range.start===null&&range.end===null)return;
+
+        const initialStart=range.start??range.end;
+        const initialEnd=range.end??range.start;
+        let candidate=side==="start"?initialStart:initialEnd;
+
+        document.body.classList.add("roadmap-resizing");
+        handle.closest(".roadmap-month-task-bar")?.classList.add("roadmap-resizing-bar");
+
+        const preview=document.createElement("div");
+        preview.className="roadmap-resize-tooltip";
+        document.body.appendChild(preview);
+
+        const updatePreview=()=>{
+          const start=side==="start"?candidate:initialStart;
+          const end=side==="end"?candidate:initialEnd;
+          preview.textContent=`${dateTextValue(monthStartDate(start))} — ${dateTextValue(monthEndDate(end))}`;
+          preview.style.left=Math.min(window.innerWidth-210,e.clientX+12)+"px";
+          preview.style.top=Math.max(8,e.clientY-30)+"px";
+        };
+        updatePreview();
+
+        const onMove=moveEvent=>{
+          const monthIndex=roadmapMonthAtPoint(moveEvent.clientX,moveEvent.clientY);
+          if(monthIndex===null)return;
+
+          candidate=side==="start"
+            ? Math.min(monthIndex,initialEnd)
+            : Math.max(monthIndex,initialStart);
+
+          const start=side==="start"?candidate:initialStart;
+          const end=side==="end"?candidate:initialEnd;
+          preview.textContent=`${dateTextValue(monthStartDate(start))} — ${dateTextValue(monthEndDate(end))}`;
+          preview.style.left=Math.min(window.innerWidth-210,moveEvent.clientX+12)+"px";
+          preview.style.top=Math.max(8,moveEvent.clientY-30)+"px";
+
+          document.querySelectorAll(".roadmap-month-resize-target").forEach(x=>x.classList.remove("roadmap-month-resize-target"));
+          const pointEl=document.elementFromPoint(moveEvent.clientX,moveEvent.clientY);
+          pointEl?.closest?.("[data-roadmap-month-start]")?.classList.add("roadmap-month-resize-target");
+        };
+
+        const finish=()=>{
+          document.removeEventListener("pointermove",onMove);
+          document.removeEventListener("pointerup",onUp);
+          document.removeEventListener("pointercancel",cancel);
+          document.body.classList.remove("roadmap-resizing");
+          handle.closest(".roadmap-month-task-bar")?.classList.remove("roadmap-resizing-bar");
+          document.querySelectorAll(".roadmap-month-resize-target").forEach(x=>x.classList.remove("roadmap-month-resize-target"));
+          preview.remove();
+        };
+
+        const onUp=()=>{
+          if(side==="start"){
+            task.plannedStartDate=monthStartDate(candidate);
+            if(!task.plannedCloseDate)task.plannedCloseDate=monthEndDate(initialEnd);
+          }else{
+            task.plannedCloseDate=monthEndDate(candidate);
+            if(!task.plannedStartDate)task.plannedStartDate=monthStartDate(initialStart);
+          }
+          finish();
+          save();
+          render();
+        };
+
+        const cancel=()=>finish();
+
+        document.addEventListener("pointermove",onMove);
+        document.addEventListener("pointerup",onUp,{once:true});
+        document.addEventListener("pointercancel",cancel,{once:true});
+      });
+    });
+  }
+
   function bindRoadmapMonthDrag(){
     const card=$("roadmapScroll");
     if(!card)return;
@@ -4763,7 +4934,7 @@ renderFeatures(m);
         const feature=state[active]?.features?.[fi];
         const task=feature?.tasks?.[ti];
 
-        if(!task||statusBucket(task.status)==="closed"){
+        if(!task||dateInputValue(task.actualCloseDate)||statusBucket(task.status)==="closed"){
           e.preventDefault();
           return;
         }
@@ -4808,7 +4979,7 @@ renderFeatures(m);
         const monthIndex=roadmapDropMonthIndex(cell,e);
         const task=state[active]?.features?.[dragData.fi]?.tasks?.[dragData.ti];
 
-        if(!task||monthIndex===null||statusBucket(task.status)==="closed")return;
+        if(!task||monthIndex===null||dateInputValue(task.actualCloseDate)||statusBucket(task.status)==="closed")return;
 
         task.plannedStartDate=monthStartDate(monthIndex);
         task.plannedCloseDate=monthEndDate(monthIndex);
@@ -5492,7 +5663,7 @@ renderFeatures(m);
         <div class="form-group"><label>Статус</label><select id="tStatus" class="form-control">${opts.map(x=>`<option ${x===t.status?"selected":""}>${esc(x)}</option>`).join("")}</select></div>
         <div class="form-group"><label>Доработка</label><textarea id="tTitle" class="form-control">${esc(t.title)}</textarea></div>
 
-        <div class="form-group"><label>Дата планового начала</label><div class="task-date-picker"><input id="tPlannedStartDate" class="form-control" type="date" value="${esc(dateInputValue(t.plannedStartDate))}">
+        <div class="form-group"><label>Дата планового начала</label><div class="task-date-picker"><input id="tPlannedStartDate" class="form-control task-date-text" type="text" inputmode="numeric" autocomplete="off" placeholder="ДД.ММ.ГГГГ" value="${esc(dateTextValue(t.plannedStartDate))}">
 <button type="button" class="task-date-picker-btn" data-date-picker="tPlannedStartDate" title="Выбрать дату" aria-label="Выбрать дату">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M6 3v3M18 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"
@@ -5502,7 +5673,7 @@ renderFeatures(m);
   </svg>
 </button>
 </div></div>
-        <div class="form-group"><label>Дата планового закрытия</label><div class="task-date-picker"><input id="tPlannedCloseDate" class="form-control" type="date" value="${esc(dateInputValue(t.plannedCloseDate))}">
+        <div class="form-group"><label>Дата планового закрытия</label><div class="task-date-picker"><input id="tPlannedCloseDate" class="form-control task-date-text" type="text" inputmode="numeric" autocomplete="off" placeholder="ДД.ММ.ГГГГ" value="${esc(dateTextValue(t.plannedCloseDate))}">
 <button type="button" class="task-date-picker-btn" data-date-picker="tPlannedCloseDate" title="Выбрать дату" aria-label="Выбрать дату">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M6 3v3M18 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"
@@ -5512,7 +5683,7 @@ renderFeatures(m);
   </svg>
 </button>
 </div></div>
-        <div class="form-group"><label>Дата фактического начала</label><div class="task-date-picker"><input id="tActualStartDate" class="form-control" type="date" value="${esc(dateInputValue(t.actualStartDate))}">
+        <div class="form-group"><label>Дата фактического начала</label><div class="task-date-picker"><input id="tActualStartDate" class="form-control task-date-text" type="text" inputmode="numeric" autocomplete="off" placeholder="ДД.ММ.ГГГГ" value="${esc(dateTextValue(t.actualStartDate))}">
 <button type="button" class="task-date-picker-btn" data-date-picker="tActualStartDate" title="Выбрать дату" aria-label="Выбрать дату">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M6 3v3M18 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"
@@ -5522,7 +5693,7 @@ renderFeatures(m);
   </svg>
 </button>
 </div></div>
-        <div class="form-group"><label>Дата фактического закрытия</label><div class="task-date-picker"><input id="tActualCloseDate" class="form-control" type="date" value="${esc(dateInputValue(t.actualCloseDate))}">
+        <div class="form-group"><label>Дата фактического закрытия</label><div class="task-date-picker"><input id="tActualCloseDate" class="form-control task-date-text" type="text" inputmode="numeric" autocomplete="off" placeholder="ДД.ММ.ГГГГ" value="${esc(dateTextValue(t.actualCloseDate))}">
 <button type="button" class="task-date-picker-btn" data-date-picker="tActualCloseDate" title="Выбрать дату" aria-label="Выбрать дату">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M6 3v3M18 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"
@@ -5612,20 +5783,54 @@ renderFeatures(m);
     if(!pickerButton)return;
     e.preventDefault();
     e.stopPropagation();
-    const input=$(pickerButton.dataset.datePicker);
-    if(!input)return;
+
+    const textInput=$(pickerButton.dataset.datePicker);
+    if(!textInput)return;
+
+    const current=normalizeTaskDateText(textInput.value);
+    const native=document.createElement("input");
+    native.type="date";
+    native.className="task-native-date-proxy";
+    if(current)native.value=current;
+
+    const rect=pickerButton.getBoundingClientRect();
+    native.style.left=Math.max(0,rect.left)+"px";
+    native.style.top=Math.max(0,rect.bottom)+"px";
+    document.body.appendChild(native);
+
+    const cleanup=()=>setTimeout(()=>native.remove(),0);
+    native.addEventListener("change",()=>{
+      if(native.value){
+        textInput.value=dateTextValue(native.value);
+        textInput.classList.remove("date-input-invalid");
+        textInput.dispatchEvent(new Event("change",{bubbles:true}));
+      }
+      cleanup();
+    },{once:true});
+    native.addEventListener("blur",cleanup,{once:true});
+
     try{
-      if(typeof input.showPicker==="function"){
-        input.showPicker();
+      if(typeof native.showPicker==="function"){
+        native.showPicker();
       }else{
-        input.focus();
-        input.click();
+        native.click();
       }
     }catch(err){
-      input.focus();
-      input.click();
+      native.focus();
+      native.click();
     }
   });
+
+  document.addEventListener("blur",e=>{
+    if(!e.target.matches?.(".task-date-text"))return;
+    const value=normalizeTaskDateText(e.target.value);
+    if(value===null){
+      e.target.classList.add("date-input-invalid");
+      return;
+    }
+    e.target.classList.remove("date-input-invalid");
+    e.target.value=value?dateTextValue(value):"";
+  },true);
 
 document.addEventListener("click",e=>{
     const taskCard=e.target.closest(".task-item[data-task-url]");
@@ -5689,8 +5894,38 @@ document.addEventListener("click",e=>{
     }
     if(act==="save-task"){
       const oldFi=Number(b.dataset.fi),raw=b.dataset.ti,newFi=Number($("tFeature").value);
-      const obj={number:$("tNumber").value.trim().replace(/^#/,""),status:$("tStatus").value,title:$("tTitle").value.trim(),plannedStartDate:$("tPlannedStartDate").value||"",plannedCloseDate:$("tPlannedCloseDate").value||"",actualStartDate:$("tActualStartDate").value||"",actualCloseDate:$("tActualCloseDate").value||"",monetizationLevel:$("tMoneyLevel").value,monetizationReason:$("tMoneyReason").value.trim()};if(!obj.title)return;
-      if(raw==="")state[active].features[newFi].tasks.push(obj);else{const ti=Number(raw);if(oldFi===newFi)state[active].features[oldFi].tasks[ti]=obj;else{state[active].features[oldFi].tasks.splice(ti,1);state[active].features[newFi].tasks.push(obj)}}
+      const plannedStartDate=normalizeTaskDateField("tPlannedStartDate");
+      const plannedCloseDate=normalizeTaskDateField("tPlannedCloseDate");
+      const actualStartDate=normalizeTaskDateField("tActualStartDate");
+      const actualCloseDate=normalizeTaskDateField("tActualCloseDate");
+
+      if([plannedStartDate,plannedCloseDate,actualStartDate,actualCloseDate].some(value=>value===null)){
+        return;
+      }
+
+      const obj={
+        number:$("tNumber").value.trim().replace(/^#/,""),
+        status:$("tStatus").value,
+        title:$("tTitle").value.trim(),
+        plannedStartDate,
+        plannedCloseDate,
+        actualStartDate,
+        actualCloseDate,
+        monetizationLevel:$("tMoneyLevel").value,
+        monetizationReason:$("tMoneyReason").value.trim()
+      };
+      if(!obj.title)return;
+
+      if(raw===""){
+        state[active].features[newFi].tasks.push(obj);
+      }else{
+        const ti=Number(raw);
+        if(oldFi===newFi)state[active].features[oldFi].tasks[ti]=obj;
+        else{
+          state[active].features[oldFi].tasks.splice(ti,1);
+          state[active].features[newFi].tasks.push(obj);
+        }
+      }
       save();closeModal();render();return
     }
   });
@@ -8800,5 +9035,98 @@ textarea{
 }
 .network-board{
   padding-top:0!important;
+}
+</style>
+
+<style>
+/* v87: one calendar icon + pasteable date text */
+.task-date-picker{
+  display:flex!important;
+  align-items:stretch!important;
+  width:100%!important;
+}
+.task-date-picker .task-date-text{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  border-radius:3px 0 0 3px!important;
+}
+.task-date-picker-btn{
+  flex:0 0 34px!important;
+  width:34px!important;
+  min-width:34px!important;
+  border-left:0!important;
+}
+.task-native-date-proxy{
+  position:fixed!important;
+  z-index:999999!important;
+  width:2px!important;
+  height:2px!important;
+  padding:0!important;
+  border:0!important;
+  opacity:.01!important;
+  pointer-events:none!important;
+}
+.task-date-text.date-input-invalid{
+  border-color:#D9534F!important;
+  box-shadow:0 0 0 2px rgba(217,83,79,.12)!important;
+}
+
+/* v87: Gantt-like planned-date stretching */
+.roadmap-month-task-bar.roadmap-task-resizable{
+  position:relative!important;
+  overflow:visible!important;
+}
+.roadmap-resize-handle{
+  position:absolute!important;
+  top:0!important;
+  bottom:0!important;
+  width:7px!important;
+  z-index:8!important;
+  cursor:ew-resize!important;
+  background:transparent!important;
+}
+.roadmap-resize-left{left:-2px!important}
+.roadmap-resize-right{right:-2px!important}
+
+.roadmap-resize-handle::after{
+  content:""!important;
+  position:absolute!important;
+  top:3px!important;
+  bottom:3px!important;
+  width:2px!important;
+  border-radius:1px!important;
+  background:rgba(49,63,78,.38)!important;
+}
+.roadmap-resize-left::after{left:2px!important}
+.roadmap-resize-right::after{right:2px!important}
+
+.roadmap-task-resizable:hover .roadmap-resize-handle::after{
+  background:rgba(49,63,78,.72)!important;
+}
+body.roadmap-resizing,
+body.roadmap-resizing *{
+  cursor:ew-resize!important;
+  user-select:none!important;
+}
+.roadmap-resizing-bar{
+  outline:2px solid #4A8DC6!important;
+  outline-offset:-1px!important;
+}
+.roadmap-month-resize-target{
+  box-shadow:inset 0 0 0 2px #4A8DC6!important;
+}
+.roadmap-resize-tooltip{
+  position:fixed!important;
+  z-index:100000!important;
+  min-width:190px!important;
+  padding:5px 8px!important;
+  border:1px solid #AFC5D8!important;
+  background:#FFFFFF!important;
+  color:#394956!important;
+  box-shadow:0 3px 10px rgba(32,41,54,.16)!important;
+  font-size:11px!important;
+  line-height:14px!important;
+  white-space:nowrap!important;
+  pointer-events:none!important;
 }
 </style>
