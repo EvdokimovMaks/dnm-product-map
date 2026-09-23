@@ -4498,8 +4498,16 @@ renderFeatures(m);
 
   function roadmapDateRange(task,status){
     const isDone=statusBucket(status)==="closed";
-    const startValue=isDone ? task.actualStartDate : task.plannedStartDate;
-    const endValue=isDone ? task.actualCloseDate : task.plannedCloseDate;
+
+    // Roadmap uses actual dates independently for each boundary:
+    // start: actual start if present, otherwise planned start;
+    // end: actual close if present, otherwise planned close.
+    const startValue=dateInputValue(task.actualStartDate)
+      ? task.actualStartDate
+      : task.plannedStartDate;
+    const endValue=dateInputValue(task.actualCloseDate)
+      ? task.actualCloseDate
+      : task.plannedCloseDate;
 
     let start=quarterIndexFromDate(startValue);
     let end=quarterIndexFromDate(endValue);
@@ -4636,8 +4644,16 @@ renderFeatures(m);
 
   function roadmapMonthRange(task,status){
     const isDone=statusBucket(status)==="closed";
-    const startValue=isDone ? task.actualStartDate : task.plannedStartDate;
-    const endValue=isDone ? task.actualCloseDate : task.plannedCloseDate;
+
+    // Each side of the interval prefers fact independently.
+    // This allows an in-progress task to start from actualStartDate
+    // and still end at plannedCloseDate until actualCloseDate appears.
+    const startValue=dateInputValue(task.actualStartDate)
+      ? task.actualStartDate
+      : task.plannedStartDate;
+    const endValue=dateInputValue(task.actualCloseDate)
+      ? task.actualCloseDate
+      : task.plannedCloseDate;
 
     let start=monthIndexFromDate(startValue);
     let end=monthIndexFromDate(endValue);
@@ -5001,7 +5017,7 @@ renderFeatures(m);
 
         const currentlyCollapsed=isRoadmapQuarterCollapsed(module.name,quarterIndex);
         setRoadmapQuarterCollapsed(module.name,quarterIndex,!currentlyCollapsed);
-        render();
+        rerenderRoadmapPreservingViewport();
       });
     });
 
@@ -5055,7 +5071,7 @@ renderFeatures(m);
         const quarterIndex=Number(handle.dataset.roadmapQuarterResize);
         if(!Number.isFinite(quarterIndex))return;
         resetRoadmapQuarterWidth(module.name,quarterIndex);
-        render();
+        rerenderRoadmapPreservingViewport();
       });
 
       handle.addEventListener("pointerdown",e=>{
@@ -5102,17 +5118,93 @@ renderFeatures(m);
         const onUp=()=>{
           setRoadmapQuarterWidth(module.name,quarterIndex,currentTotalWidth);
           finish();
-          render();
+          rerenderRoadmapPreservingViewport();
         };
 
         const onCancel=()=>{
           finish();
-          render();
+          rerenderRoadmapPreservingViewport();
         };
 
         document.addEventListener("pointermove",onMove);
         document.addEventListener("pointerup",onUp,{once:true});
         document.addEventListener("pointercancel",onCancel,{once:true});
+      });
+    });
+  }
+
+  function roadmapTaskAnchor(fi,ti){
+    if(fi===undefined||ti===undefined||fi===null||ti===null)return null;
+    const bar=document.querySelector(
+      `[data-roadmap-drag-fi="${Number(fi)}"][data-roadmap-drag-ti="${Number(ti)}"]`
+    );
+    const row=bar?.closest(".roadmap-task-row")||null;
+    if(!row)return null;
+    return {
+      fi:Number(fi),
+      ti:Number(ti),
+      viewportTop:row.getBoundingClientRect().top
+    };
+  }
+
+  function rerenderRoadmapPreservingViewport(anchor=null){
+    const pageX=window.scrollX||0;
+    const pageY=window.scrollY||0;
+    const oldRoadmap=$("roadmapScroll");
+    const roadmapLeft=oldRoadmap?.scrollLeft||0;
+    const roadmapTop=oldRoadmap?.scrollTop||0;
+    const topLeft=$("roadmapScrollTop")?.scrollLeft||roadmapLeft;
+
+    render();
+
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const roadmap=$("roadmapScroll");
+        const topScroll=$("roadmapScrollTop");
+
+        // Restore both axes of the roadmap itself. Vertical scrolling is
+        // intentionally inside .roadmap-card, so restoring only window.scrollY
+        // is not sufficient.
+        if(roadmap){
+          roadmap.scrollLeft=roadmapLeft;
+          roadmap.scrollTop=roadmapTop;
+        }
+        if(topScroll)topScroll.scrollLeft=topLeft;
+        window.scrollTo(pageX,pageY);
+
+        if(anchor){
+          const bar=document.querySelector(
+            `[data-roadmap-drag-fi="${anchor.fi}"][data-roadmap-drag-ti="${anchor.ti}"]`
+          );
+          const row=bar?.closest(".roadmap-task-row")||null;
+
+          if(row){
+            const newTop=row.getBoundingClientRect().top;
+            const delta=newTop-anchor.viewportTop;
+
+            if(Math.abs(delta)>0.5){
+              const roadmapCanScroll=roadmap&&roadmap.scrollHeight>roadmap.clientHeight+1;
+
+              if(roadmapCanScroll){
+                roadmap.scrollTop+=delta;
+              }else{
+                window.scrollBy(0,delta);
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(()=>{
+          const roadmap2=$("roadmapScroll");
+          const topScroll2=$("roadmapScrollTop");
+
+          if(roadmap2){
+            roadmap2.scrollLeft=roadmapLeft;
+          }
+          if(topScroll2)topScroll2.scrollLeft=roadmapLeft;
+
+          renderRoadmapTodayLine();
+        });
       });
     });
   }
@@ -5270,6 +5362,8 @@ renderFeatures(m);
         };
 
         const onUp=()=>{
+          const viewportAnchor=roadmapTaskAnchor(fi,ti);
+
           if(side==="start"){
             task.plannedStartDate=monthStartDate(candidate);
             if(!task.plannedCloseDate)task.plannedCloseDate=monthEndDate(initialEnd);
@@ -5279,7 +5373,7 @@ renderFeatures(m);
           }
           finish();
           save();
-          render();
+          rerenderRoadmapPreservingViewport(viewportAnchor);
         };
 
         const cancel=()=>finish();
@@ -5351,12 +5445,14 @@ renderFeatures(m);
 
         if(!task||monthIndex===null||dateInputValue(task.actualCloseDate)||statusBucket(task.status)==="closed")return;
 
+        const viewportAnchor=roadmapTaskAnchor(dragData.fi,dragData.ti);
+
         task.plannedStartDate=monthStartDate(monthIndex);
         task.plannedCloseDate=monthEndDate(monthIndex);
 
         dragData=null;
         save();
-        render();
+        rerenderRoadmapPreservingViewport(viewportAnchor);
       });
     });
   }
@@ -5413,14 +5509,20 @@ renderFeatures(m);
       scroll.addEventListener("scroll",()=>{
         if(syncing)return;
         syncing=true;
-        topScroll.scrollLeft=scroll.scrollLeft;
+        if(topScroll.scrollLeft!==scroll.scrollLeft){
+          topScroll.scrollLeft=scroll.scrollLeft;
+        }
         syncing=false;
       });
 
       topScroll.addEventListener("scroll",()=>{
         if(syncing)return;
         syncing=true;
+        const keepTop=scroll.scrollTop;
         scroll.scrollLeft=topScroll.scrollLeft;
+        // Horizontal synchronization must not alter the internal vertical
+        // position of the roadmap.
+        if(scroll.scrollTop!==keepTop)scroll.scrollTop=keepTop;
         syncing=false;
       });
 
@@ -9683,5 +9785,102 @@ body.roadmap-quarter-width-resizing *{
   line-height:11px!important;
   font-weight:700!important;
   white-space:nowrap!important;
+}
+</style>
+
+<style>
+/* v92: consolidated roadmap scrolling */
+
+/* One vertical scroll container only. Horizontal movement is controlled
+   by the upper scrollbar and synchronized programmatically. */
+#timelineView{
+  overflow:visible!important;
+}
+
+#roadmapScroll.roadmap-card{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  max-height:calc(100vh - 235px)!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-x:contain!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-gutter:stable!important;
+  scroll-behavior:auto!important;
+}
+
+/* There must be no second horizontal scrollbar below the table. */
+#roadmapScroll.roadmap-card::-webkit-scrollbar:horizontal{
+  height:0!important;
+}
+#roadmapScroll.roadmap-card{
+  scrollbar-width:auto;
+}
+
+/* Upper horizontal scrollbar controls only the time axis. */
+#roadmapScrollTop.roadmap-scroll-top{
+  box-sizing:border-box!important;
+  margin-left:180px!important;
+  width:calc(100% - 180px)!important;
+  min-width:0!important;
+  height:13px!important;
+  margin-bottom:3px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  position:relative!important;
+  z-index:70!important;
+}
+
+/* QUARTER row: first sticky header level. Higher specificity deliberately
+   overrides legacy .roadmap-table thead th { top:0!important }. */
+.roadmap-table thead tr.roadmap-quarter-header-row > th{
+  position:sticky!important;
+  top:0!important;
+  z-index:52!important;
+}
+
+/* MONTH row: second sticky header level, directly below quarters. */
+.roadmap-table thead tr.roadmap-month-header-row > th{
+  position:sticky!important;
+  top:20px!important;
+  z-index:51!important;
+}
+
+/* The direction header spans both rows and stays above both levels. */
+.roadmap-table thead tr.roadmap-quarter-header-row > th.roadmap-feature-head{
+  position:sticky!important;
+  top:0!important;
+  left:0!important;
+  height:38px!important;
+  min-height:38px!important;
+  z-index:65!important;
+  background:#F5F5F5!important;
+}
+
+/* A collapsed quarter spans both header rows. */
+.roadmap-table thead tr.roadmap-quarter-header-row > th.roadmap-quarter-group-collapsed{
+  top:0!important;
+  z-index:54!important;
+}
+
+/* Direction cells stay fixed horizontally while the time axis moves. */
+.roadmap-table tbody > tr > td.roadmap-feature-cell{
+  position:sticky!important;
+  left:0!important;
+  z-index:24!important;
+}
+
+/* Keep the visual hierarchy from v90. */
+.roadmap-table thead tr.roadmap-quarter-header-row > th.roadmap-quarter-group-head{
+  background:#D7DEE6!important;
+  color:#2F3B48!important;
+  border-bottom:1px solid #B9C2CC!important;
+}
+.roadmap-table thead tr.roadmap-month-header-row > th.roadmap-month-head{
+  background:#F5F7F9!important;
+  color:#66727F!important;
+  border-bottom:1px solid #DDE2E7!important;
 }
 </style>
