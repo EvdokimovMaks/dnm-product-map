@@ -4921,7 +4921,7 @@ renderFeatures(m);
                     title="Изменить дату планового начала"></span>`:""}
               <div class="roadmap-quarter-bar-content">
                 ${taskLinkHtml(row)}
-                <span class="roadmap-inline-status ${labelClass(status)}">${esc(status)}</span>
+                <span class="roadmap-inline-status ${labelClass(status)}" data-status-bucket="${statusBucket(status)}">${esc(status)}</span>
                 <button type="button"
                         class="roadmap-task-edit"
                         data-action="edit-task"
@@ -5672,7 +5672,7 @@ renderFeatures(m);
                draggable="true"
                data-drag-stage="${esc(stage)}"
                title="Перетащите этап, чтобы изменить порядок">
-            <span class="stage-label ${labelClass(stage)}">${esc(stage)}</span>
+            <span class="stage-label ${labelClass(stage)}" data-status-bucket="${statusBucket(stage)}">${esc(stage)}</span>
             <span class="stage-count">${stageTasks.length}</span>
           </div>
           <div class="list-group stage-task-list">
@@ -10196,5 +10196,132 @@ th.roadmap-feature-head{
   background:#D7B947!important;
   border-color:#C4A73B!important;
   color:#413A20!important;
+}
+</style>
+
+<style id="dnm-map-style-v99">
+/* Development map: header-matched canvas, direction frames and task outlines. */
+:root{--canvas:#FFFFFF}
+html,body{background-color:var(--canvas)!important}
+#roadmapView,
+#roadmapView .network-board,
+#roadmapView .task-column,
+#roadmapView .task-list,
+#roadmapView .stage-group,
+#roadmapView .stage-group-head,
+#roadmapView .stage-task-list{
+  background-color:var(--canvas)!important;
+}
+
+/* Keep the existing header blue; extend it around the progress area. */
+#roadmapView .feature-panel{
+  border:5px solid #747FC5!important;
+  border-radius:8px!important;
+  background:#747FC5!important;
+  overflow:hidden!important;
+}
+#roadmapView .feature-panel .panel-body{
+  border-radius:0 0 4px 4px!important;
+}
+
+/* Each task has its own complete outline, including the last task. */
+#roadmapView .stage-group{
+  border-color:transparent!important;
+}
+#roadmapView .stage-task-list .task-item{
+  border:1px solid #B8B8B8!important;
+  border-radius:6px!important;
+}
+#roadmapView .stage-task-list .task-item + .task-item{
+  margin-top:3px!important;
+}
+</style>
+
+<style id="dnm-map-spacing-v100">
+/* Small gaps after the status bar and before direction headers. */
+.module-subtabs-inner.compact-viewbar .compact-status-rail{
+  margin-bottom:8px!important;
+}
+#topScroll{
+  margin-bottom:8px!important;
+}
+</style>
+
+<style id="dnm-map-alignment-v101">
+/* Stage headers keep their own neutral surface above the white task canvas. */
+#roadmapView .stage-group-head{
+  background-color:#F6F8F9!important;
+  display:flex!important;
+  align-items:center!important;
+}
+#roadmapView .stage-group-head .stage-label{
+  display:block!important;
+  flex:0 1 auto!important;
+  min-width:0!important;
+  min-height:16px!important;
+  line-height:14px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#roadmapView .stage-group-head .stage-count{
+  line-height:16px!important;
+  align-self:center!important;
+}
+
+/* Reserve space for actions instead of placing them over direction titles. */
+#roadmapView .feature-panel .panel-heading{
+  display:flex!important;
+  align-items:center!important;
+}
+#roadmapView .feature-panel .feature-heading-main{
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+#roadmapView .feature-panel .feature-actions{
+  position:static!important;
+  flex:0 0 auto!important;
+  align-self:center!important;
+}
+
+/* Align monospace IDs with the first line of the task title. */
+#roadmapView .task-title-row{
+  align-items:baseline!important;
+}
+#roadmapView .task-item .task-id,
+#roadmapView .task-item .task-title{
+  font-size:12px!important;
+  line-height:14px!important;
+}
+#roadmapView .task-item .task-id{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+#roadmapView .task-item .task-title{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+</style>
+
+<style id="dnm-stage-tags-v102">
+/* Center label text in both views without changing the current tag sizes. */
+#roadmapView .stage-group-head .stage-label,
+#timelineView .roadmap-inline-status{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  vertical-align:middle!important;
+}
+
+/* Use the same status bucket as the multi-select progress filter. */
+#roadmapView .stage-group-head .stage-label[data-status-bucket="inwork"],
+#timelineView .roadmap-inline-status[data-status-bucket="inwork"]{
+  background:#7E7FBF!important;
+  border-color:#7E7FBF!important;
+  color:#FFFFFF!important;
+  border-radius:2px!important;
+  font-weight:700!important;
 }
 </style>
