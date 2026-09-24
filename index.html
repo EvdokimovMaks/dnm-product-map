@@ -3873,7 +3873,7 @@ body.auth-pending > :not(#authGate){
   let state=prioritizeModules(hydrateDescriptions(migrateState(load())));
   let active=0;
   let viewMode="roadmap";
-  let taskStageFilter=null;
+  let taskStageFilters=new Set();
   let topStageFilters=new Set();
   let topDirectionFilters=new Set();
   let topPriorityFilters=new Set();
@@ -4102,6 +4102,29 @@ body.auth-pending > :not(#authGate){
     const level=m[1][0].toUpperCase()+m[1].slice(1).toLowerCase();
     return{level,reason:m[2]||""};
   }
+
+  function featureMoneyValue(feature){
+    const legacy=money(feature?.monetization);
+    const hasLevel=feature&&Object.prototype.hasOwnProperty.call(feature,"monetizationLevel");
+    const hasReason=feature&&Object.prototype.hasOwnProperty.call(feature,"monetizationReason");
+
+    const level=hasLevel&&["Высокий","Средний","Низкий"].includes(String(feature.monetizationLevel||"").trim())
+      ? String(feature.monetizationLevel).trim()
+      : legacy.level;
+
+    const reason=hasReason
+      ? String(feature.monetizationReason??"")
+      : legacy.reason;
+
+    return {level,reason};
+  }
+
+  function taskMoneyReasonValue(task,featureMoney){
+    return task&&Object.prototype.hasOwnProperty.call(task,"monetizationReason")
+      ? String(task.monetizationReason??"")
+      : String(featureMoney?.reason??"");
+  }
+
   function labelClass(status){
     const s=String(status||"").trim().toLowerCase();
 
@@ -4210,7 +4233,7 @@ body.auth-pending > :not(#authGate){
         e.preventDefault();
         e.stopPropagation();
         active=i;
-        taskStageFilter=null;
+        taskStageFilters.clear();
         topStageFilters.clear();
         topDirectionFilters.clear();
         topPriorityFilters.clear();
@@ -4220,7 +4243,7 @@ body.auth-pending > :not(#authGate){
         render();
       };
 
-      a.onclick=e=>{e.preventDefault();active=i;taskStageFilter=null;topStageFilters.clear();topDirectionFilters.clear();topPriorityFilters.clear();topQuarterFilters.clear();closeTopFilterMenu();render()};
+      a.onclick=e=>{e.preventDefault();active=i;taskStageFilters.clear();topStageFilters.clear();topDirectionFilters.clear();topPriorityFilters.clear();topQuarterFilters.clear();closeTopFilterMenu();render()};
       a.appendChild(descriptionButton);
       li.appendChild(a);ul.appendChild(li);
     })
@@ -4375,7 +4398,6 @@ body.auth-pending > :not(#authGate){
     topPriorityFilters=normalizedFilterSet(selectedPriorities,priorities);
     topQuarterFilters=normalizedFilterSet(selectedQuarters,quarters.map(q=>String(q.index)));
 
-    taskStageFilter=null;
     closeTopFilterMenu();
     render();
   }
@@ -4420,7 +4442,7 @@ body.auth-pending > :not(#authGate){
       <div class="summary-progress-wrap">
         <div class="summary-progress progress-with-labels compact-progress-bar" aria-label="Фильтры по статусу">
           <button type="button"
-                  class="summary-progress-segment closed ${taskStageFilter==="closed"?"active":""}"
+                  class="summary-progress-segment closed ${taskStageFilters.has("closed")?"active":""}"
                   style="width:${closedW}%"
                   data-stage-filter="closed"
                   aria-label="Закрыто: ${closedCount}"
@@ -4428,7 +4450,7 @@ body.auth-pending > :not(#authGate){
             <span class="progress-segment-label">Закрыто - ${closedCount}</span>
           </button>
           <button type="button"
-                  class="summary-progress-segment inwork ${taskStageFilter==="inwork"?"active":""}"
+                  class="summary-progress-segment inwork ${taskStageFilters.has("inwork")?"active":""}"
                   style="width:${inworkW}%"
                   data-stage-filter="inwork"
                   aria-label="В работе: ${inwork}"
@@ -4436,7 +4458,7 @@ body.auth-pending > :not(#authGate){
             <span class="progress-segment-label">В работе - ${inwork}</span>
           </button>
           <button type="button"
-                  class="summary-progress-segment planned ${taskStageFilter==="planned"?"active":""}"
+                  class="summary-progress-segment planned ${taskStageFilters.has("planned")?"active":""}"
                   style="width:${plannedW}%"
                   data-stage-filter="planned"
                   aria-label="В планах: ${planned}"
@@ -4699,6 +4721,7 @@ renderFeatures(m);
 
     const rows=sourceRows.filter(row=>{
       const stage=String(row.status||"").trim()||"Без статуса";
+      const bucketOk=!taskStageFilters.size||taskStageFilters.has(row.bucket);
       const stageOk=!topStageFilters.size||topStageFilters.has(stage);
       const directionOk=!topDirectionFilters.size||row.featureNames.some(name=>topDirectionFilters.has(name));
       const priorityOk=!topPriorityFilters.size||topPriorityFilters.has(row.priority);
@@ -4710,7 +4733,7 @@ renderFeatures(m);
         row.priority,
         ...(row.featureNames||[])
       ].some(value=>String(value||"").toLowerCase().includes(query));
-      return stageOk&&directionOk&&priorityOk&&quarterOk&&queryOk;
+      return bucketOk&&stageOk&&directionOk&&priorityOk&&quarterOk&&queryOk;
     });
 
     const months=topQuarterFilters.size
@@ -4780,7 +4803,7 @@ renderFeatures(m);
         ? `<a class="roadmap-quarter-task-link" href="https://infotech.zetep.com/board/5/213/infotech-ru/dsfsubaru/issue/${esc(task.number)}" target="_blank" rel="noopener noreferrer" title="${esc(text)}">${esc(text)}</a>`
         : `<span class="roadmap-quarter-task-link" title="${esc(text)}">${esc(text)}</span>`;
 
-      return `${link}<button type="button" class="roadmap-task-edit" data-action="edit-task" data-fi="${row.sourceFi}" data-ti="${row.sourceTi}" title="Редактировать доработку" aria-label="Редактировать доработку">${iconSvg("edit")}</button>`;
+      return link;
     };
 
     const quarterGroups=[];
@@ -4899,6 +4922,13 @@ renderFeatures(m);
               <div class="roadmap-quarter-bar-content">
                 ${taskLinkHtml(row)}
                 <span class="roadmap-inline-status ${labelClass(status)}">${esc(status)}</span>
+                <button type="button"
+                        class="roadmap-task-edit"
+                        data-action="edit-task"
+                        data-fi="${row.sourceFi}"
+                        data-ti="${row.sourceTi}"
+                        title="Редактировать доработку"
+                        aria-label="Редактировать доработку">${iconSvg("edit")}</button>
               </div>
               ${canPlanAdjust?`<span class="roadmap-resize-handle roadmap-resize-right"
                     draggable="false"
@@ -5497,8 +5527,16 @@ renderFeatures(m);
     if(!scroll||!topScroll||!topInner||!table)return;
 
     const stickyWidth=180;
+
+    // The roadmap can have a vertical scrollbar. Use its real clientWidth
+    // instead of CSS calc(100% - 180px), otherwise the upper scrollbar
+    // becomes wider than the visible timeline by the scrollbar width.
+    const visibleTimelineWidth=Math.max(0,scroll.clientWidth-stickyWidth);
+    topScroll.style.marginLeft=stickyWidth+"px";
+    topScroll.style.width=visibleTimelineWidth+"px";
+
     const scrollableWidth=Math.max(
-      topScroll.clientWidth+1,
+      visibleTimelineWidth,
       table.scrollWidth-stickyWidth
     );
     topInner.style.width=scrollableWidth+"px";
@@ -5575,7 +5613,7 @@ renderFeatures(m);
     return "inwork";
   }
   function passesStageFilter(t){
-    const bucketOk=!taskStageFilter||taskBucket(t)===taskStageFilter;
+    const bucketOk=!taskStageFilters.size||taskStageFilters.has(taskBucket(t));
     const exactOk=!topStageFilters.size||topStageFilters.has(String(t.status||"").trim()||"Без статуса");
     const quarterOk=taskMatchesQuarterFilter(t,t.status);
     return bucketOk&&exactOk&&quarterOk;
@@ -5584,7 +5622,7 @@ renderFeatures(m);
   function taskQueryMatch(t,f){return !q()||featureQueryMatch(f)||matches(taskText(t))}
   function featureVisible(f){
     if(topDirectionFilters.size && !topDirectionFilters.has(f.name))return false;
-    if(!q()&&!taskStageFilter&&!topStageFilters.size&&!topPriorityFilters.size&&!topQuarterFilters.size)return true;
+    if(!q()&&!taskStageFilters.size&&!topStageFilters.size&&!topPriorityFilters.size&&!topQuarterFilters.size)return true;
     return f.tasks.some(t=>passesStageFilter(t)&&taskMatchesPriorityFilter(t,f)&&taskQueryMatch(t,f));
   }
 
@@ -5618,7 +5656,7 @@ renderFeatures(m);
       if(!featureVisible(f))return;
       shown++;
 
-      const mp=money(f.monetization);
+      const mp=featureMoneyValue(f);
       const tasks=visibleTasks(f);
       const groups=groupTasksByStage(tasks);
       const key=`${active}:${fi}`;
@@ -6063,9 +6101,9 @@ renderFeatures(m);
   }
 
   function showTaskPopover(anchor,fi,ti){
-    const f=state[active].features[fi],t=f.tasks[ti],fm=money(f.monetization),p=$("popover");
+    const f=state[active].features[fi],t=f.tasks[ti],fm=featureMoneyValue(f),p=$("popover");
     const level=t.monetizationLevel||fm.level||"Средний";
-    const reason=t.monetizationReason||fm.reason||"Обоснование не указано.";
+    const reason=taskMoneyReasonValue(t,fm)||"Обоснование не указано.";
 
     $("popoverTitle").textContent="Монетизация доработки";
     $("popoverContent").innerHTML=`
@@ -6086,7 +6124,7 @@ renderFeatures(m);
   }
 
   function showPopover(anchor,fi){
-    const f=state[active].features[fi],mp=money(f.monetization),p=$("popover");
+    const f=state[active].features[fi],mp=featureMoneyValue(f),p=$("popover");
     $("popoverTitle").textContent=f.name;
     const cls=mp.level==="Высокий"?"high":mp.level==="Низкий"?"low":"";
     $("popoverContent").innerHTML=`
@@ -6112,7 +6150,7 @@ renderFeatures(m);
   function closeModal(){$("modalBackdrop").classList.remove("in");$("modal").classList.remove("in")}
 
   function featureModal(fi=null){
-    const m=state[active],f=fi===null?{name:"",why:"",monetization:"Средний. ",tasks:[]}:m.features[fi],mp=money(f.monetization);
+    const m=state[active],f=fi===null?{name:"",why:"",monetization:"Средний. ",monetizationLevel:"Средний",monetizationReason:"",tasks:[]}:m.features[fi],mp=featureMoneyValue(f);
     openModal(`<div class="modal-header"><h4 class="modal-title">${fi===null?"Добавить функционал":"Редактировать функционал"}</h4></div>
       <div class="modal-body">
         <div class="form-group"><label>Функционал</label><input id="fName" class="form-control" value="${esc(f.name)}"></div>
@@ -6123,8 +6161,8 @@ renderFeatures(m);
       <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Отмена</button> <button class="btn btn-primary" data-modal="save-feature" data-fi="${fi===null?"":fi}">Сохранить</button></div>`)
   }
   function taskModal(fi,ti=null){
-    const m=state[active],f=m.features[fi],featureMoney=money(f.monetization);
-    const t=ti===null?{number:"",status:"В планах",title:"",monetizationLevel:featureMoney.level,monetizationReason:featureMoney.reason,plannedStartDate:"2026-09-22",plannedCloseDate:"",actualStartDate:"",actualCloseDate:""}:f.tasks[ti];
+    const m=state[active],f=m.features[fi],featureMoney=featureMoneyValue(f);
+    const t=ti===null?{number:"",status:"В планах",title:"",monetizationLevel:featureMoney.level,monetizationReason:featureMoney.reason,plannedStartDate:"2026-09-22",plannedCloseDate:"",actualStartDate:"",actualCloseDate:"",spentHours:"",estimate:""}:f.tasks[ti];
     const statuses=["В планах","Backlog","Аналитика и проработка","Дизайн","Обсуждение и оценка DNM","Ждем согласования/оплаты/ДС","Очередь","В работе","Тестирование","Вылить","Реализовано","Code review","На проверке постановщиком","Закрыто"];
     const opts=[...new Set([...statuses,t.status].filter(Boolean))];
     const tLevel=t.monetizationLevel||featureMoney.level||"Средний";
@@ -6175,8 +6213,10 @@ renderFeatures(m);
   </svg>
 </button>
 </div></div>
+        <div class="form-group"><label>Кол-во затраченных часов</label><input id="tSpentHours" class="form-control" type="number" min="0" step="0.1" inputmode="decimal" value="${esc(t.spentHours??"")}"></div>
+        <div class="form-group"><label>Оценка</label><input id="tEstimate" class="form-control" type="number" min="0" step="0.1" inputmode="decimal" value="${esc(t.estimate??"")}"></div>
         <div class="form-group"><label>Приоритет монетизации</label><select id="tMoneyLevel" class="form-control">${["Высокий","Средний","Низкий"].map(x=>`<option ${x===tLevel?"selected":""}>${x}</option>`).join("")}</select></div>
-        <div class="form-group"><label>Обоснование монетизации</label><textarea id="tMoneyReason" class="form-control">${esc(t.monetizationReason||featureMoney.reason||"")}</textarea></div>
+        <div class="form-group"><label>Обоснование монетизации</label><textarea id="tMoneyReason" class="form-control">${esc(taskMoneyReasonValue(t,featureMoney))}</textarea></div>
       </div>
       <div class="modal-footer"><button class="btn btn-default" data-modal="cancel">Отмена</button> <button class="btn btn-primary" data-modal="save-task" data-fi="${fi}" data-ti="${ti===null?"":ti}">Сохранить</button></div>`);
   }
@@ -6186,7 +6226,7 @@ renderFeatures(m);
   }
 
   function featureMoneyModal(fi){
-    const f=state[active].features[fi],mp=money(f.monetization);
+    const f=state[active].features[fi],mp=featureMoneyValue(f);
     openModal(`<div class="modal-header"><h4 class="modal-title">Монетизация функционала</h4></div>
       <div class="modal-body">
         <div class="money-modal-priority"><span class="label ${moneyLabel(mp.level)}">${esc(mp.level)}</span></div>
@@ -6196,7 +6236,7 @@ renderFeatures(m);
   }
 
   function taskMoneyModal(fi,ti){
-    const f=state[active].features[fi],t=f.tasks[ti],fm=money(f.monetization);
+    const f=state[active].features[fi],t=f.tasks[ti],fm=featureMoneyValue(f);
     const level=t.monetizationLevel||fm.level||"Средний";
     const reason=t.monetizationReason||fm.reason||"Обоснование не указано.";
     openModal(`<div class="modal-header"><h4 class="modal-title">Монетизация доработки</h4></div>
@@ -6360,8 +6400,22 @@ document.addEventListener("click",e=>{
     }
     if(act==="save-feature"){
       const raw=b.dataset.fi,name=$("fName").value.trim();if(!name)return;
-      const obj={name,why:$("fWhy").value.trim(),monetization:`${$("fLevel").value}. ${$("fReason").value.trim()}`.trim(),tasks:[]};
-      if(raw==="")state[active].features.push(obj);else{const i=Number(raw);obj.tasks=state[active].features[i].tasks;state[active].features[i]=obj}
+      const level=$("fLevel").value;
+      const reason=$("fReason").value.trim();
+      const obj={
+        name,
+        why:$("fWhy").value.trim(),
+        monetizationLevel:level,
+        monetizationReason:reason,
+        monetization:reason?`${level}. ${reason}`:`${level}.`,
+        tasks:[]
+      };
+      if(raw==="")state[active].features.push(obj);
+      else{
+        const i=Number(raw);
+        obj.tasks=state[active].features[i].tasks;
+        state[active].features[i]=obj;
+      }
       save();closeModal();render();return
     }
     if(act==="save-task"){
@@ -6383,6 +6437,8 @@ document.addEventListener("click",e=>{
         plannedCloseDate,
         actualStartDate,
         actualCloseDate,
+        spentHours:$("tSpentHours").value.trim(),
+        estimate:$("tEstimate").value.trim(),
         monetizationLevel:$("tMoneyLevel").value,
         monetizationReason:$("tMoneyReason").value.trim()
       };
@@ -6425,7 +6481,7 @@ document.addEventListener("click",e=>{
     topDirectionFilters.clear();
     topPriorityFilters.clear();
     topQuarterFilters.clear();
-    taskStageFilter=null;
+    taskStageFilters.clear();
     closeTopFilterMenu();
     render();
   });
@@ -6455,7 +6511,8 @@ document.addEventListener("click",e=>{
     const el=e.target.closest("[data-stage-filter]");
     if(!el)return;
     const value=el.dataset.stageFilter;
-    taskStageFilter=taskStageFilter===value?null:value;
+    if(taskStageFilters.has(value))taskStageFilters.delete(value);
+    else taskStageFilters.add(value);
     render();
   };
   window.addEventListener("resize",()=>requestAnimationFrame(()=>{syncTopScroll();drawNetworkArrows()}));
@@ -6706,6 +6763,8 @@ document.addEventListener("click",e=>{
     {id:"plannedCloseDate",label:"Дата планового закрытия",aliases:["дата планового закрытия","плановая дата закрытия","плановое закрытие","planned close","planned close date"]},
     {id:"actualStartDate",label:"Дата фактического начала",aliases:["дата фактического начала","фактическая дата начала","фактическое начало","actual start","actual start date","дата создания"]},
     {id:"actualCloseDate",label:"Дата фактического закрытия",aliases:["дата фактического закрытия","фактическая дата закрытия","фактическое закрытие","actual close","actual close date","дата закрытия"]},
+    {id:"spentHours",label:"Кол-во затраченных часов",aliases:["кол-во затраченных часов","количество затраченных часов","затраченные часы","фактические часы","spent hours","hours spent"]},
+    {id:"estimate",label:"Оценка",aliases:["оценка","оценка часов","оценка трудозатрат","плановая оценка","estimate","estimated hours"]},
     {id:"monetizationLevel",label:"Приоритет монетизации",aliases:["приоритет монетизации","приоритет монетизации доработки","приоритет","priority"]},
     {id:"monetizationReason",label:"Обоснование монетизации",aliases:["обоснование монетизации","обоснование монетизации доработки","комментарий монетизации","monetization reason"]}
   ];
@@ -6833,7 +6892,9 @@ document.addEventListener("click",e=>{
     module.features.push({
       name:clean,
       why:"",
-      monetization:"Средний. ",
+      monetization:"Средний.",
+      monetizationLevel:"Средний",
+      monetizationReason:"",
       tasks:[]
     });
     stats.featuresCreated++;
@@ -6871,11 +6932,15 @@ document.addEventListener("click",e=>{
     const plannedCloseRaw=importedFieldValue(row,mapping,"plannedCloseDate");
     const actualStartRaw=importedFieldValue(row,mapping,"actualStartDate");
     const actualCloseRaw=importedFieldValue(row,mapping,"actualCloseDate");
+    const spentHoursRaw=importedFieldValue(row,mapping,"spentHours");
+    const estimateRaw=importedFieldValue(row,mapping,"estimate");
     const priorityRaw=importedFieldValue(row,mapping,"monetizationLevel");
     const reason=importedFieldValue(row,mapping,"monetizationReason");
 
     if(status)task.status=status;
     if(title)task.title=title;
+    if(spentHoursRaw)task.spentHours=spentHoursRaw.replace(",",".");
+    if(estimateRaw)task.estimate=estimateRaw.replace(",",".");
     if(reason)task.monetizationReason=reason;
 
     const datePairs=[
@@ -7028,7 +7093,7 @@ document.addEventListener("click",e=>{
       // Номер задачи не найден: задача создаётся всегда.
       const targetFi=ensureFeatureForTaskUpdate(module,featureName,stats);
       const feature=module.features[targetFi];
-      const featureMoney=money(feature.monetization);
+      const featureMoney=featureMoneyValue(feature);
 
       const task={
         number,
@@ -7038,6 +7103,8 @@ document.addEventListener("click",e=>{
         plannedCloseDate:"",
         actualStartDate:"",
         actualCloseDate:"",
+        spentHours:"",
+        estimate:"",
         monetizationLevel:featureMoney.level||"Средний",
         monetizationReason:featureMoney.reason||""
       };
@@ -7055,7 +7122,7 @@ document.addEventListener("click",e=>{
 
     // После обновления показываем результат без старых фильтров,
     // чтобы новые задачи не выглядели как "не созданные".
-    taskStageFilter=null;
+    taskStageFilters.clear();
     topStageFilters.clear();
     topDirectionFilters.clear();
     topPriorityFilters.clear();
@@ -9882,5 +9949,252 @@ body.roadmap-quarter-width-resizing *{
   background:#F5F7F9!important;
   color:#66727F!important;
   border-bottom:1px solid #DDE2E7!important;
+}
+</style>
+
+<style>
+/* v94: roadmap layout normalization */
+
+:root{
+  --roadmap-direction-w:180px;
+  --roadmap-quarter-h:24px;
+  --roadmap-month-h:22px;
+}
+
+/* Keep dropdowns above the sticky roadmap header. */
+.module-tabsbar{
+  z-index:90!important;
+}
+.compact-map-controls{
+  z-index:95!important;
+}
+.top-filter-menu{
+  z-index:1200!important;
+  top:calc(100% + 5px)!important;
+  max-height:min(520px,calc(100vh - 245px))!important;
+  overscroll-behavior:contain!important;
+}
+
+/* One clean scroll viewport. */
+#roadmapScroll.roadmap-card{
+  position:relative!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  border:1px solid #DCE2E8!important;
+  border-radius:2px!important;
+  background:#fff!important;
+}
+
+/* Upper scrollbar is resized by JS to the actual visible timeline width. */
+#roadmapScrollTop.roadmap-scroll-top{
+  box-sizing:border-box!important;
+  margin-left:var(--roadmap-direction-w)!important;
+  width:calc(100% - var(--roadmap-direction-w))!important;
+  min-width:0!important;
+  height:14px!important;
+  margin-bottom:4px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  position:relative!important;
+  z-index:75!important;
+}
+
+/* Colgroup controls widths. Old 120px min/max rules on THs caused
+   headers and resized quarters to disagree with the body. */
+.roadmap-table col.roadmap-month-col,
+.roadmap-table col.roadmap-collapsed-quarter-col{
+  min-width:0!important;
+  max-width:none!important;
+}
+.roadmap-table th.roadmap-month-head,
+.roadmap-table th.roadmap-quarter-group-collapsed{
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+/* Quarter header row. */
+.roadmap-table thead tr.roadmap-quarter-header-row{
+  height:var(--roadmap-quarter-h)!important;
+}
+.roadmap-table thead tr.roadmap-quarter-header-row > th{
+  position:sticky!important;
+  top:0!important;
+  height:var(--roadmap-quarter-h)!important;
+  min-height:var(--roadmap-quarter-h)!important;
+  padding:0!important;
+  vertical-align:top!important;
+  z-index:54!important;
+  background:#CDD5DE!important;
+  color:#2F3B48!important;
+  border-right:1px solid #B7C0CA!important;
+  border-bottom:1px solid #B7C0CA!important;
+  box-sizing:border-box!important;
+}
+
+/* The label itself occupies exactly the first header row. This fixes
+   collapsed Q1/Q2 labels appearing one row lower than expanded quarters. */
+.roadmap-table .roadmap-quarter-heading-label{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:var(--roadmap-quarter-h)!important;
+  min-height:var(--roadmap-quarter-h)!important;
+  padding:0 22px 0 6px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  box-sizing:border-box!important;
+  font-size:10px!important;
+  line-height:12px!important;
+  font-weight:700!important;
+}
+
+/* A collapsed quarter spans both rows, but its caption and arrow stay
+   aligned with the quarter row instead of being vertically centered. */
+.roadmap-table thead tr.roadmap-quarter-header-row >
+th.roadmap-quarter-group-collapsed{
+  height:calc(var(--roadmap-quarter-h) + var(--roadmap-month-h))!important;
+  min-height:calc(var(--roadmap-quarter-h) + var(--roadmap-month-h))!important;
+  vertical-align:top!important;
+  background:#C7D0DA!important;
+  z-index:56!important;
+}
+.roadmap-quarter-group-collapsed .roadmap-quarter-toggle{
+  top:calc(var(--roadmap-quarter-h) / 2)!important;
+}
+
+/* Month header row is lighter and remains fixed immediately below Q row. */
+.roadmap-table thead tr.roadmap-month-header-row{
+  height:var(--roadmap-month-h)!important;
+}
+.roadmap-table thead tr.roadmap-month-header-row > th{
+  position:sticky!important;
+  top:var(--roadmap-quarter-h)!important;
+  height:var(--roadmap-month-h)!important;
+  min-height:var(--roadmap-month-h)!important;
+  padding:0 4px!important;
+  vertical-align:middle!important;
+  z-index:53!important;
+  background:#F4F6F8!important;
+  color:#687481!important;
+  border-right:1px solid #E0E4E8!important;
+  border-bottom:1px solid #D7DDE3!important;
+  box-sizing:border-box!important;
+  font-size:9px!important;
+  line-height:11px!important;
+  font-weight:600!important;
+}
+
+/* Direction header spans both rows, aligned with the quarter captions. */
+.roadmap-table thead tr.roadmap-quarter-header-row >
+th.roadmap-feature-head{
+  position:sticky!important;
+  top:0!important;
+  left:0!important;
+  width:var(--roadmap-direction-w)!important;
+  min-width:var(--roadmap-direction-w)!important;
+  max-width:var(--roadmap-direction-w)!important;
+  height:calc(var(--roadmap-quarter-h) + var(--roadmap-month-h))!important;
+  min-height:calc(var(--roadmap-quarter-h) + var(--roadmap-month-h))!important;
+  padding:7px 6px 0!important;
+  vertical-align:top!important;
+  z-index:70!important;
+  background:#F4F6F8!important;
+  color:#53606D!important;
+  border-right:1px solid #C8D0D8!important;
+  border-bottom:1px solid #D7DDE3!important;
+  box-sizing:border-box!important;
+}
+
+/* Quarter controls stay inside the first header row. */
+.roadmap-quarter-toggle{
+  top:calc(var(--roadmap-quarter-h) / 2)!important;
+  right:11px!important;
+  transform:translateY(-50%)!important;
+  z-index:8!important;
+}
+.roadmap-quarter-width-handle{
+  top:0!important;
+  bottom:0!important;
+  z-index:9!important;
+}
+
+/* Left direction cells must stay above bars when horizontally scrolled. */
+.roadmap-table tbody > tr > td.roadmap-feature-cell{
+  position:sticky!important;
+  left:0!important;
+  z-index:30!important;
+  box-sizing:border-box!important;
+}
+
+/* Timeline cells should never create their own width model. */
+.roadmap-table td.roadmap-month-cell{
+  min-width:0!important;
+  max-width:none!important;
+}
+
+/* Prevent tiny white seams around the sticky headers while scrolling. */
+.roadmap-table{
+  border-spacing:0!important;
+}
+.roadmap-table thead{
+  background:#fff!important;
+}
+
+/* Keep the filter usable on the production viewport shown in the screenshot. */
+@media(max-height:700px){
+  .top-filter-menu{
+    max-height:calc(100vh - 205px)!important;
+  }
+  .top-filter-options{
+    max-height:120px!important;
+  }
+}
+</style>
+
+<style>
+/* v98: roadmap task controls/readability */
+.roadmap-quarter-bar-content .roadmap-task-edit{
+  order:3!important;
+  margin-left:1px!important;
+  flex:0 0 auto!important;
+}
+.roadmap-quarter-bar-content .roadmap-inline-status{
+  order:2!important;
+  flex:0 0 auto!important;
+}
+
+/* In-work statuses were too pale because the roadmap override replaced
+   label-primary's fill with near-white while retaining white text. */
+.roadmap-quarter-bar-content .roadmap-inline-status.label-primary{
+  background:#6572B4!important;
+  border-color:#5967A9!important;
+  color:#FFFFFF!important;
+}
+
+/* Keep other roadmap statuses readable on light/planned bars as well. */
+.roadmap-quarter-bar-content .roadmap-inline-status.label-default{
+  background:#E2E6EA!important;
+  border-color:#CCD2D8!important;
+  color:#3F4852!important;
+}
+.roadmap-quarter-bar-content .roadmap-inline-status.label-info{
+  background:#DCE2F5!important;
+  border-color:#C5CDEF!important;
+  color:#5364A0!important;
+}
+.roadmap-quarter-bar-content .roadmap-inline-status.label-review{
+  background:#D8DEEF!important;
+  border-color:#C0C8E0!important;
+  color:#4C5D91!important;
+}
+.roadmap-quarter-bar-content .roadmap-inline-status.label-warning{
+  background:#D7B947!important;
+  border-color:#C4A73B!important;
+  color:#413A20!important;
 }
 </style>
