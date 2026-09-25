@@ -3700,7 +3700,13 @@ body.auth-pending > :not(#authGate){
   font-weight:600;
 }
 .promotion-summary-table .promotion-summary-metric span{display:block;margin-top:2px;color:#929DA7;font-size:9px;font-weight:400}
-.promotion-summary-table td.has-marketing-value{background:#EDF5E9!important}
+/* Progressive green intensity: the larger the count, the darker the cell. */
+.marketing-table td.marketing-fill-1,.promotion-summary-table td.marketing-fill-1{background:#EDF5E9!important}
+.marketing-table td.marketing-fill-2,.promotion-summary-table td.marketing-fill-2{background:#E3F0DD!important}
+.marketing-table td.marketing-fill-3,.promotion-summary-table td.marketing-fill-3{background:#D7EACD!important}
+.marketing-table td.marketing-fill-4,.promotion-summary-table td.marketing-fill-4{background:#C7E2BA!important}
+.marketing-table td.marketing-fill-5,.promotion-summary-table td.marketing-fill-5{background:#B2D79F!important}
+.marketing-table td.marketing-fill-6,.promotion-summary-table td.marketing-fill-6{background:#98CA80!important}
 .promotion-summary-table .marketing-count-input{
   width:44px!important;
   height:22px!important;
@@ -3727,6 +3733,13 @@ body.auth-pending > :not(#authGate){
 }
 </style>
 
+
+<style id="dnm-modal-stackfix-v107">
+/* Keep every modal fully above the sticky application header and navigation. */
+.modal-backdrop{z-index:2000!important;}
+.modal{z-index:2010!important;}
+.modal.in{display:block!important;}
+</style>
 </head>
 <body class="auth-pending">
 <div id="authGate" class="auth-gate" aria-live="polite">
@@ -4183,18 +4196,21 @@ body.auth-pending > :not(#authGate){
   }
 
   const marketingFields=[
+    {key:"presentation",label:"Преза",type:"checkbox"},
     {key:"landing",label:"Лендинг",type:"checkbox"},
     {key:"popup",label:"Pop up в интерфейсе",type:"checkbox"},
     {key:"tgPublications",label:"ТГ публикации",type:"count"},
     {key:"conferences",label:"Конференции",type:"count"},
     {key:"digestMentions",label:"Упоминания в дайджестах",type:"count"},
     {key:"siteArticles",label:"Статьи на сайте",type:"count"},
-    {key:"pulseSurveys",label:"Пульс-опросы",type:"count"},
-    {key:"custDev",label:"Cust Dev",type:"count"}
+    {key:"pulseSurveys",label:"Опросы пользователей",type:"count"},
+    {key:"dnmFeedback",label:"ОС в DNM",type:"checkbox"},
+    {key:"custDev",label:"Cust Dev",type:"checkbox"}
   ];
 
   function defaultMarketing(){
     return {
+      presentation:false,
       landing:false,
       popup:false,
       tgPublications:0,
@@ -4202,7 +4218,8 @@ body.auth-pending > :not(#authGate){
       digestMentions:0,
       siteArticles:0,
       pulseSurveys:0,
-      custDev:0
+      dnmFeedback:false,
+      custDev:false
     };
   }
 
@@ -4211,7 +4228,9 @@ body.auth-pending > :not(#authGate){
     const result=defaultMarketing();
     marketingFields.forEach(field=>{
       if(field.type==="checkbox"){
-        result[field.key]=source[field.key]===true||source[field.key]===1||String(source[field.key]||"").toLowerCase()==="true";
+        const raw=source[field.key];
+        const normalized=String(raw??"").trim().toLowerCase();
+        result[field.key]=raw===true||Number(raw)>0||["true","да","yes","on"].includes(normalized);
       }else{
         const n=Number(source[field.key]);
         result[field.key]=Number.isFinite(n)&&n>0?Math.floor(n):0;
@@ -5868,6 +5887,30 @@ renderFeatures(m);
     return field?.type==="checkbox"?!!value:(Number(value)||0)>0;
   }
 
+  function marketingFillLevel(field,value){
+    if(!marketingHasValue(field,value))return 0;
+    if(field?.type==="checkbox")return 1;
+    const n=Math.max(0,Math.floor(Number(value)||0));
+    if(n<=1)return 1;
+    if(n<=3)return 2;
+    if(n<=5)return 3;
+    if(n<=8)return 4;
+    if(n<=12)return 5;
+    return 6;
+  }
+
+  function marketingFillClass(field,value){
+    const level=marketingFillLevel(field,value);
+    return level?`marketing-fill-${level}`:"";
+  }
+
+  function applyMarketingCellFill(cell,field,value){
+    if(!cell)return;
+    for(let level=1;level<=6;level++)cell.classList.remove(`marketing-fill-${level}`);
+    const fillClass=marketingFillClass(field,value);
+    if(fillClass)cell.classList.add(fillClass);
+  }
+
   function marketingControlHtml(moduleIndex,field,value,context="product"){
     const common=`data-marketing-module="${moduleIndex}" data-marketing-field="${esc(field.key)}" data-marketing-context="${context}"`;
     if(field.type==="checkbox"){
@@ -5891,8 +5934,8 @@ renderFeatures(m);
         <tbody>
           ${marketingFields.map(field=>`
             <tr>
-              <th scope="row">${esc(field.label)}<span class="marketing-value-type">${field.type==="checkbox"?"ЧБ":"кол-во"}</span></th>
-              <td>${marketingControlHtml(moduleIndex,field,marketing[field.key],"product")}</td>
+              <th scope="row">${esc(field.label)}</th>
+              <td class="${marketingFillClass(field,marketing[field.key])}">${marketingControlHtml(moduleIndex,field,marketing[field.key],"product")}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -5933,14 +5976,14 @@ renderFeatures(m);
   }
 
   function promotionSummaryModal(){
-    const headers=marketingFields.map(field=>`<th scope="col">${esc(field.label)}<span class="marketing-value-type">${field.type==="checkbox"?"ЧБ":"кол-во"}</span></th>`).join("");
+    const headers=marketingFields.map(field=>`<th scope="col">${esc(field.label)}</th>`).join("");
     const rows=state.map((module,moduleIndex)=>{
       module.marketing=normalizeMarketing(module.marketing);
       return `<tr>
         <th scope="row" class="promotion-summary-metric">${esc(module.name)}</th>
         ${marketingFields.map(field=>{
           const value=module.marketing[field.key];
-          return `<td class="${marketingHasValue(field,value)?"has-marketing-value":""}">${marketingControlHtml(moduleIndex,field,value,"summary")}</td>`;
+          return `<td class="${marketingFillClass(field,value)}">${marketingControlHtml(moduleIndex,field,value,"summary")}</td>`;
         }).join("")}
       </tr>`;
     }).join("");
@@ -5980,9 +6023,9 @@ renderFeatures(m);
       if(other===control)return;
       if(field.type==="checkbox")other.checked=value;
       else other.value=String(value);
-      other.closest("td")?.classList.toggle("has-marketing-value",marketingHasValue(field,value));
+      applyMarketingCellFill(other.closest("td"),field,value);
     });
-    control.closest("td")?.classList.toggle("has-marketing-value",marketingHasValue(field,value));
+    applyMarketingCellFill(control.closest("td"),field,value);
     save();
   }
 
@@ -7240,7 +7283,7 @@ document.addEventListener("click",e=>{
 
   function exportPromotionSummaryToXlsx(){
     const rows=[["Продукт",...marketingFields.map(field=>field.label)]];
-    const fills=[[false,...marketingFields.map(()=>false)]];
+    const fillLevels=[[0,...marketingFields.map(()=>0)]];
 
     state.forEach(module=>{
       module.marketing=normalizeMarketing(module.marketing);
@@ -7251,16 +7294,17 @@ document.addEventListener("click",e=>{
           return field.type==="checkbox"?(value?"Да":"Нет"):(Number(value)||0);
         })
       ]);
-      fills.push([
-        false,
-        ...marketingFields.map(field=>marketingHasValue(field,module.marketing[field.key]))
+      fillLevels.push([
+        0,
+        ...marketingFields.map(field=>marketingFillLevel(field,module.marketing[field.key]))
       ]);
     });
 
     const sheetRows=rows.map((row,ri)=>{
       const cells=row.map((value,ci)=>{
         const ref=`${promotionSummaryXlsxCol(ci)}${ri+1}`;
-        const style=ri===0?1:(ci===0?3:(fills[ri][ci]?2:4));
+        const level=fillLevels[ri][ci]||0;
+        const style=ri===0?1:(ci===0?8:(level?1+level:9));
         if(typeof value==="number"&&Number.isFinite(value))return `<c r="${ref}" s="${style}"><v>${value}</v></c>`;
         return `<c r="${ref}" t="inlineStr" s="${style}"><is><t>${promotionSummaryXmlEscape(value)}</t></is></c>`;
       }).join("");
@@ -7271,7 +7315,7 @@ document.addEventListener("click",e=>{
     const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${lastCol}${rows.length}"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="34" customWidth="1"/><col min="2" max="${marketingFields.length+1}" width="16" customWidth="1"/></cols><sheetData>${sheetRows}</sheetData><autoFilter ref="A1:${lastCol}${rows.length}"/></worksheet>`;
     const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF5E9"/><bgColor indexed="64"/></patternFill></fill><borders count="2"><border/><border><left style="thin"><color rgb="FFE3E7EB"/></left><right style="thin"><color rgb="FFE3E7EB"/></right><top style="thin"><color rgb="FFE3E7EB"/></top><bottom style="thin"><color rgb="FFE3E7EB"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="2" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="8"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF5E9"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE3F0DD"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD7EACD"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFC7E2BA"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFB2D79F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF98CA80"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFE3E7EB"/></left><right style="thin"><color rgb="FFE3E7EB"/></right><top style="thin"><color rgb="FFE3E7EB"/></top><bottom style="thin"><color rgb="FFE3E7EB"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="10"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="2" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="5" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="6" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="7" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
     const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Продвижение" sheetId="1" r:id="rId1"/></sheets></workbook>`;
     const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
     const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
