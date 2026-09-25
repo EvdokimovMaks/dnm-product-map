@@ -3664,9 +3664,9 @@ body.auth-pending > :not(#authGate){
   background:#fff;
 }
 .promotion-summary-table th,.promotion-summary-table td{
-  min-width:150px;
-  height:42px;
-  padding:6px 9px;
+  min-width:112px;
+  height:34px;
+  padding:4px 5px;
   border-right:1px solid #E3E7EB;
   border-bottom:1px solid #E3E7EB;
   text-align:center;
@@ -3687,8 +3687,8 @@ body.auth-pending > :not(#authGate){
 .promotion-summary-table .promotion-summary-metric{
   position:sticky;
   left:0;
-  min-width:210px!important;
-  width:210px!important;
+  min-width:175px!important;
+  width:175px!important;
   text-align:left!important;
   z-index:4;
   background:#F8F9FB;
@@ -3700,6 +3700,16 @@ body.auth-pending > :not(#authGate){
   font-weight:600;
 }
 .promotion-summary-table .promotion-summary-metric span{display:block;margin-top:2px;color:#929DA7;font-size:9px;font-weight:400}
+.promotion-summary-table td.has-marketing-value{background:#EDF5E9!important}
+.promotion-summary-table .marketing-count-input{
+  width:44px!important;
+  height:22px!important;
+  padding:1px 4px!important;
+  font-size:10px!important;
+  line-height:18px!important;
+}
+.promotion-summary-table .marketing-checkbox-wrap{width:20px;height:20px}
+.promotion-summary-table .marketing-checkbox{width:13px;height:13px}
 .promotion-summary-table tr:last-child th,.promotion-summary-table tr:last-child td{border-bottom:0}
 .promotion-summary-table th:last-child,.promotion-summary-table td:last-child{border-right:0}
 
@@ -3712,8 +3722,8 @@ body.auth-pending > :not(#authGate){
   .promotion-summary-btn span:last-child{display:none!important}
   .promotion-summary-btn{width:34px!important;min-width:34px!important}
   .modal-dialog.promotion-summary-dialog{width:100%!important}
-  .promotion-summary-table th,.promotion-summary-table td{min-width:132px}
-  .promotion-summary-table .promotion-summary-metric-head,.promotion-summary-table .promotion-summary-metric{min-width:175px!important;width:175px!important}
+  .promotion-summary-table th,.promotion-summary-table td{min-width:105px}
+  .promotion-summary-table .promotion-summary-metric-head,.promotion-summary-table .promotion-summary-metric{min-width:160px!important;width:160px!important}
 }
 </style>
 
@@ -5854,6 +5864,10 @@ renderFeatures(m);
     });
   }
 
+  function marketingHasValue(field,value){
+    return field?.type==="checkbox"?!!value:(Number(value)||0)>0;
+  }
+
   function marketingControlHtml(moduleIndex,field,value,context="product"){
     const common=`data-marketing-module="${moduleIndex}" data-marketing-field="${esc(field.key)}" data-marketing-context="${context}"`;
     if(field.type==="checkbox"){
@@ -5924,7 +5938,10 @@ renderFeatures(m);
       module.marketing=normalizeMarketing(module.marketing);
       return `<tr>
         <th scope="row" class="promotion-summary-metric">${esc(module.name)}</th>
-        ${marketingFields.map(field=>`<td>${marketingControlHtml(moduleIndex,field,module.marketing[field.key],"summary")}</td>`).join("")}
+        ${marketingFields.map(field=>{
+          const value=module.marketing[field.key];
+          return `<td class="${marketingHasValue(field,value)?"has-marketing-value":""}">${marketingControlHtml(moduleIndex,field,value,"summary")}</td>`;
+        }).join("")}
       </tr>`;
     }).join("");
 
@@ -5963,7 +5980,9 @@ renderFeatures(m);
       if(other===control)return;
       if(field.type==="checkbox")other.checked=value;
       else other.value=String(value);
+      other.closest("td")?.classList.toggle("has-marketing-value",marketingHasValue(field,value));
     });
+    control.closest("td")?.classList.toggle("has-marketing-value",marketingHasValue(field,value));
     save();
   }
 
@@ -7149,8 +7168,79 @@ document.addEventListener("click",e=>{
     return "\ufeff"+rows.map(r=>r.map(escapeCsv).join(";")).join("\r\n");
   }
 
-  function exportPromotionSummaryToCsv(){
+  function promotionSummaryXmlEscape(value){
+    return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]));
+  }
+
+  function promotionSummaryXlsxCol(index){
+    let n=index+1,out="";
+    while(n){n--;out=String.fromCharCode(65+(n%26))+out;n=Math.floor(n/26)}
+    return out;
+  }
+
+  let promotionSummaryCrcTable=null;
+  function promotionSummaryCrc32(bytes){
+    if(!promotionSummaryCrcTable){
+      promotionSummaryCrcTable=new Uint32Array(256);
+      for(let n=0;n<256;n++){
+        let c=n;
+        for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+        promotionSummaryCrcTable[n]=c>>>0;
+      }
+    }
+    let crc=0xFFFFFFFF;
+    for(const b of bytes)crc=promotionSummaryCrcTable[(crc^b)&0xFF]^(crc>>>8);
+    return (crc^0xFFFFFFFF)>>>0;
+  }
+
+  function promotionSummaryZipStore(files){
+    const enc=new TextEncoder();
+    const chunks=[];
+    const central=[];
+    let offset=0;
+    const push16=(arr,v)=>{arr.push(v&255,(v>>>8)&255)};
+    const push32=(arr,v)=>{arr.push(v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255)};
+
+    files.forEach(file=>{
+      const name=enc.encode(file.name);
+      const data=typeof file.data==="string"?enc.encode(file.data):file.data;
+      const crc=promotionSummaryCrc32(data);
+      const local=[];
+      push32(local,0x04034b50);push16(local,20);push16(local,0x0800);push16(local,0);
+      push16(local,0);push16(local,0);push32(local,crc);push32(local,data.length);push32(local,data.length);
+      push16(local,name.length);push16(local,0);
+      const localBytes=new Uint8Array(local.length+name.length);
+      localBytes.set(local,0);localBytes.set(name,local.length);
+      chunks.push(localBytes,data);
+
+      const cd=[];
+      push32(cd,0x02014b50);push16(cd,20);push16(cd,20);push16(cd,0x0800);push16(cd,0);
+      push16(cd,0);push16(cd,0);push32(cd,crc);push32(cd,data.length);push32(cd,data.length);
+      push16(cd,name.length);push16(cd,0);push16(cd,0);push16(cd,0);push16(cd,0);push32(cd,0);push32(cd,offset);
+      const cdBytes=new Uint8Array(cd.length+name.length);
+      cdBytes.set(cd,0);cdBytes.set(name,cd.length);
+      central.push(cdBytes);
+      offset+=localBytes.length+data.length;
+    });
+
+    const centralOffset=offset;
+    central.forEach(c=>{chunks.push(c);offset+=c.length});
+    const centralSize=offset-centralOffset;
+    const end=[];
+    push32(end,0x06054b50);push16(end,0);push16(end,0);push16(end,files.length);push16(end,files.length);
+    push32(end,centralSize);push32(end,centralOffset);push16(end,0);
+    chunks.push(new Uint8Array(end));
+
+    const total=chunks.reduce((sum,c)=>sum+c.length,0);
+    const out=new Uint8Array(total);
+    let pos=0;
+    chunks.forEach(c=>{out.set(c,pos);pos+=c.length});
+    return out;
+  }
+
+  function exportPromotionSummaryToXlsx(){
     const rows=[["Продукт",...marketingFields.map(field=>field.label)]];
+    const fills=[[false,...marketingFields.map(()=>false)]];
 
     state.forEach(module=>{
       module.marketing=normalizeMarketing(module.marketing);
@@ -7158,17 +7248,48 @@ document.addEventListener("click",e=>{
         module.name||"",
         ...marketingFields.map(field=>{
           const value=module.marketing[field.key];
-          return field.type==="checkbox"?(value?"Да":"Нет"):value;
+          return field.type==="checkbox"?(value?"Да":"Нет"):(Number(value)||0);
         })
+      ]);
+      fills.push([
+        false,
+        ...marketingFields.map(field=>marketingHasValue(field,module.marketing[field.key]))
       ]);
     });
 
-    return "\ufeff"+rows.map(row=>row.map(escapeCsv).join(";")).join("\r\n");
+    const sheetRows=rows.map((row,ri)=>{
+      const cells=row.map((value,ci)=>{
+        const ref=`${promotionSummaryXlsxCol(ci)}${ri+1}`;
+        const style=ri===0?1:(ci===0?3:(fills[ri][ci]?2:4));
+        if(typeof value==="number"&&Number.isFinite(value))return `<c r="${ref}" s="${style}"><v>${value}</v></c>`;
+        return `<c r="${ref}" t="inlineStr" s="${style}"><is><t>${promotionSummaryXmlEscape(value)}</t></is></c>`;
+      }).join("");
+      return `<row r="${ri+1}" h="22" customHeight="1">${cells}</row>`;
+    }).join("");
+
+    const lastCol=promotionSummaryXlsxCol(marketingFields.length);
+    const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${lastCol}${rows.length}"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="34" customWidth="1"/><col min="2" max="${marketingFields.length+1}" width="16" customWidth="1"/></cols><sheetData>${sheetRows}</sheetData><autoFilter ref="A1:${lastCol}${rows.length}"/></worksheet>`;
+    const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDF5E9"/><bgColor indexed="64"/></patternFill></fill><borders count="2"><border/><border><left style="thin"><color rgb="FFE3E7EB"/></left><right style="thin"><color rgb="FFE3E7EB"/></right><top style="thin"><color rgb="FFE3E7EB"/></top><bottom style="thin"><color rgb="FFE3E7EB"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="2" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Продвижение" sheetId="1" r:id="rId1"/></sheets></workbook>`;
+    const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+    const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+    const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`;
+
+    return promotionSummaryZipStore([
+      {name:"[Content_Types].xml",data:contentTypes},
+      {name:"_rels/.rels",data:rootRels},
+      {name:"xl/workbook.xml",data:workbook},
+      {name:"xl/_rels/workbook.xml.rels",data:wbRels},
+      {name:"xl/worksheets/sheet1.xml",data:sheet},
+      {name:"xl/styles.xml",data:styles}
+    ]);
   }
 
   function downloadPromotionSummary(){
-    const csv=exportPromotionSummaryToCsv();
-    download("DNM_сводка_по_продвижению.csv",csv,"text/csv;charset=utf-8");
+    const xlsx=exportPromotionSummaryToXlsx();
+    download("DNM_сводка_по_продвижению.xlsx",xlsx,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
   }
 
   function safeExportFileName(value){
